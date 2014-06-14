@@ -5,6 +5,7 @@
 #include "frame.h"
 #include "modem.h"
 #include "frameprinter.h"
+#include "configdialog.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -12,6 +13,8 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     restoreGeometry(settings_.value("mainwindow/geometry").toByteArray());
     restoreState(settings_.value("mainwindow/windowState").toByteArray());
+
+    config_dialog_ = new ConfigDialog(this);
 
     QVBoxLayout* vlayout = new QVBoxLayout();
     QWidget *widget = new QWidget();
@@ -53,6 +56,44 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(modem_, SIGNAL(frameDecorded(FramePtr)), frame_list_, SLOT(addFrame(FramePtr)));
     connect(modem_, SIGNAL(frameDecorded(FramePtr)), this, SLOT(frameDecorded()));
 
+    initializeMenuBar();
+}
+
+MainWindow::~MainWindow()
+{
+
+}
+
+void MainWindow::frameDecorded()
+{
+    decorded_packets_label_->setText(QString("Decorded packets: %0").arg(frame_list_->count()));
+}
+
+void MainWindow::selectionChanged()
+{
+    QString html;
+    foreach (const FramePtr frame, frame_list_->getFrames()) {
+        html += FramePrinter::toHtmlText(frame);
+    }
+    frame_browser_->setHtml(html);
+}
+
+void MainWindow::setInputDevice(int index)
+{
+    input_action_group_->actions().at(index)->setChecked(true);
+    modem_->setAudioDeviceIndex(index);
+    settings_.setValue("input_device", index);
+}
+
+void MainWindow::closeEvent(QCloseEvent *event)
+{
+    settings_.setValue("mainwindow/geometry", saveGeometry());
+    settings_.setValue("mainwindow/windowState", saveState());
+    QMainWindow::closeEvent(event);
+}
+
+void MainWindow::initializeMenuBar()
+{
     QMenuBar* menu = new QMenuBar;
     setMenuBar(menu);
 
@@ -85,37 +126,11 @@ MainWindow::MainWindow(QWidget *parent) :
     setInputDevice(settings_.value("input_device", 0).toUInt());
     modem_->addDemodulatorFacory(std::make_shared<DefaultDemodulatorFactory>());
     modem_->addFrameDetector(std::make_shared<FrameDetector>(modem_->audioFormat()));
+
+    QMenu *tool_menu = menu->addMenu(tr("Tools"));
+    QAction *configAct = new QAction(tr("Preferences..."), this);
+    configAct->setShortcut(QKeySequence("Ctrl+K"));
+    configAct->setMenuRole(QAction::PreferencesRole);
+    connect(configAct, SIGNAL(triggered()), config_dialog_, SLOT(show()));
+    tool_menu->addAction(configAct);
 }
-
-MainWindow::~MainWindow()
-{
-
-}
-
-void MainWindow::frameDecorded()
-{
-    decorded_packets_label_->setText(QString("Decorded packets: %0").arg(frame_list_->count()));
-}
-
-void MainWindow::selectionChanged()
-{
-    QString html;
-    foreach (const FramePtr frame, frame_list_->getFrames()) {
-        html += FramePrinter::toHtmlText(frame);
-    }
-    frame_browser_->setHtml(html);
-}
-
-void MainWindow::setInputDevice(int index)
-{
-    input_action_group_->actions().at(index)->setChecked(true);
-    modem_->setAudioDeviceIndex(index);
-    settings_.setValue("input_device", index);
-}
-
-void MainWindow::closeEvent(QCloseEvent *event)
- {
-     settings_.setValue("mainwindow/geometry", saveGeometry());
-     settings_.setValue("mainwindow/windowState", saveState());
-     QMainWindow::closeEvent(event);
- }

@@ -31,6 +31,8 @@
 #include <QActionGroup>
 #include <QSettings>
 #include <QFormLayout>
+#include <QSpinBox>
+#include <QDialogButtonBox>
 #include <QLabel>
 #include <QTimer>
 #include <QPainter>

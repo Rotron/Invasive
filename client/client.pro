@@ -18,7 +18,8 @@ SOURCES += \
     frame.cpp \
     abstractframedetector.cpp \
     framedetector.cpp \
-    frameprinter.cpp
+    frameprinter.cpp \
+    configdialog.cpp
 
 HEADERS  += \
     mainwindow.h \
@@ -34,7 +35,8 @@ HEADERS  += \
     abstractframedetector.h \
     framedetector.h \
     ringbuffer.h \
-    frameprinter.h
+    frameprinter.h \
+    configdialog.h
 
 PRECOMPILED_HEADER = stdafx.h
 precompile_header:!isEmpty(PRECOMPILED_HEADER) {

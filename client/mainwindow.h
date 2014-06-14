@@ -16,9 +16,11 @@ private slots:
     void setInputDevice(int index);
 
 private:
+    void initializeMenuBar();
     void closeEvent(QCloseEvent *event);
 
 private:
+    ConfigDialog* config_dialog_;
     FrameListWidget* frame_list_;
     QTextBrowser* frame_browser_;
     QLabel* decorded_packets_label_;

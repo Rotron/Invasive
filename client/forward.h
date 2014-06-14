@@ -3,7 +3,7 @@
 
 class FrameDetector;
 class FrameListWidget;
-class WaterfallWidget;
+class ConfigDialog;
 class Modem;
 
 class AbstractDemodulator;

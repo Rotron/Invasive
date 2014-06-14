@@ -21,11 +21,11 @@ MainWindow::MainWindow(QWidget *parent) :
     restoreGeometry(settings_.value("mainwindow/geometry").toByteArray());
     restoreState(settings_.value("mainwindow/windowState").toByteArray());
 
-    config_dialog_ = new ConfigDialog(this);
-
     quint16 port = settings_.value("server/listen_port", DEFAULT_LISTEN_PORT).toUInt();
     settings_.setValue("server/listen_port", port);
     server_ = new SocketServer(port, this);
+
+    config_dialog_ = new ConfigDialog(this);
 
     QVBoxLayout* vlayout = new QVBoxLayout();
     QWidget *widget = new QWidget();

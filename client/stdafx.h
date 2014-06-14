@@ -15,7 +15,6 @@
 #include <QMetaObject>
 #include <QtEndian>
 #include <QCryptographicHash>
-
 #include <QApplication>
 #include <QMainWindow>
 #include <QVBoxLayout>
@@ -33,6 +32,9 @@
 #include <QFormLayout>
 #include <QSpinBox>
 #include <QDialogButtonBox>
+#include <QTcpServer>
+#include <QTcpSocket>
+#include <QSet>
 #include <QLabel>
 #include <QTimer>
 #include <QPainter>

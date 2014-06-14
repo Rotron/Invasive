@@ -29,6 +29,7 @@ private slots:
 private:
     QScopedPointer<QAudioInput> audio_input_;
     QIODevice* audio_device_;
+    SocketServer* server_;
 
     QList<FrameDetectorPtr> detectors_;
     QList<DemodulatorFactoryPtr> factories_;

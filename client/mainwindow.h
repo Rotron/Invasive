@@ -26,6 +26,7 @@ private:
     QLabel* decorded_packets_label_;
 
     Modem* modem_;
+    SocketServer* server_;
     QActionGroup* input_action_group_;
     QSettings settings_;
 

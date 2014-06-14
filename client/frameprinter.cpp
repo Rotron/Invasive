@@ -1,5 +1,8 @@
 #include "frameprinter.h"
 #include "frame.h"
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QJsonArray>
 
 namespace FramePrinter {
 
@@ -61,6 +64,27 @@ QString toHtmlText(const FramePtr& frame)
     html += "<hr>";
 
     return html;
+}
+
+QString toJson(const FramePtr& frame)
+{
+    QJsonObject obj;
+    obj["datetime"] = frame->datetime().toString(Qt::ISODate);
+    obj["info-ascii"] = asciiInfo(frame);
+    obj["info-hex"] = QString::fromUtf8(frame->info().toHex());
+
+    QJsonArray addrs;
+    for (const Frame::Address& addr : frame->addresses()) {
+        QJsonObject addrobj;
+        addrobj["callsign"] = addr.callsign;
+        addrobj["repeated"] = addr.repeated;
+        addrobj["ssid"] = addr.ssid;
+        addrs.push_back(addrobj);
+    }
+    obj["addresses"] = addrs;
+
+    QJsonDocument doc(obj);
+    return doc.toJson(QJsonDocument::Compact);
 }
 
 }

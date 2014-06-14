@@ -5,6 +5,7 @@ class FrameDetector;
 class FrameListWidget;
 class ConfigDialog;
 class Modem;
+class SocketServer;
 
 class AbstractDemodulator;
 class DemodulatorFactoryInterface;

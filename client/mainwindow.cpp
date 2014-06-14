@@ -6,6 +6,13 @@
 #include "modem.h"
 #include "frameprinter.h"
 #include "configdialog.h"
+#include "socketserver.h"
+
+namespace {
+
+const int DEFAULT_LISTEN_PORT = 19780;
+
+}
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -15,6 +22,10 @@ MainWindow::MainWindow(QWidget *parent) :
     restoreState(settings_.value("mainwindow/windowState").toByteArray());
 
     config_dialog_ = new ConfigDialog(this);
+
+    quint16 port = settings_.value("server/listen_port", DEFAULT_LISTEN_PORT).toUInt();
+    settings_.setValue("server/listen_port", port);
+    server_ = new SocketServer(port, this);
 
     QVBoxLayout* vlayout = new QVBoxLayout();
     QWidget *widget = new QWidget();
@@ -39,7 +50,7 @@ MainWindow::MainWindow(QWidget *parent) :
     frame_browser_->setWordWrapMode(QTextOption::WrapAnywhere);
     right_vlayout->addWidget(frame_browser_);
 
-    QFormLayout* form = new QFormLayout(this);
+    QFormLayout* form = new QFormLayout();
     right_vlayout->addLayout(form);
 
     decorded_packets_label_ = new QLabel("Decorded packets: 0", this);
@@ -54,6 +65,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     modem_ = new Modem(this);
     connect(modem_, SIGNAL(frameDecorded(FramePtr)), frame_list_, SLOT(addFrame(FramePtr)));
+    connect(modem_, SIGNAL(frameDecorded(FramePtr)), server_, SLOT(writeFrame(FramePtr)));
     connect(modem_, SIGNAL(frameDecorded(FramePtr)), this, SLOT(frameDecorded()));
 
     initializeMenuBar();

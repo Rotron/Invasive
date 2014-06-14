@@ -8,10 +8,11 @@
 
 namespace {
 
-const int THRESHOLD_RESOLUTION = 50;
-const int MINIMUM_FARME_BYTES  = 16;
-const int SAMPLING_RATE        = 13200;
-const int BITS_PER_BYTE        = 11;
+const int THRESHOLD_RESOLUTION  = 20;
+const int MINIMUM_FARME_BYTES   = 16;
+const int SAMPLING_RATE         = 13200;
+const int BITS_PER_BYTE         = 11;
+const double THRESHOLD_WIDTH_RATIO = 2.0;
 
 }
 
@@ -69,10 +70,12 @@ FramePtr DefaultDemodulator::exec(const FrameAudio& frame_audio)
 
     for (int i = 0; i <= THRESHOLD_RESOLUTION; ++i) {
         QByteArray frame_data;
-        if (process(avg - std::fabs(avg - min) * (1.0 * i / THRESHOLD_RESOLUTION), diff_buff, &frame_data)) {
+        if (process(avg - std::fabs(avg - min / THRESHOLD_WIDTH_RATIO) *
+                    (1.0 * i / THRESHOLD_RESOLUTION), diff_buff, &frame_data)) {
             return std::make_shared<Frame>(frame_audio.startTime(), frame_data);
         }
-        if (process(avg + std::fabs(avg - max) * (1.0 * i / THRESHOLD_RESOLUTION), diff_buff, &frame_data)) {
+        if (process(avg + std::fabs(avg - max / THRESHOLD_WIDTH_RATIO) *
+                    (1.0 * i / THRESHOLD_RESOLUTION), diff_buff, &frame_data)) {
             return std::make_shared<Frame>(frame_audio.startTime(), frame_data);
         }
     }

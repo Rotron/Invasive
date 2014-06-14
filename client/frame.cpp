@@ -116,14 +116,15 @@ QString Frame::printableInfo() const
 {
     QByteArray text;
     foreach (char c, info_) {
-        if (QChar(c).isPrint()) {
+        // ascii
+        if (c >= 0x20 && c <= 0x7e) {
             text += c;
         }
         else {
             text += ".";
         }
     }
-    return QString::fromLatin1(text);
+    return QString::fromUtf8(text);
 }
 
 QList<Frame::Address> Frame::addresses() const

@@ -153,7 +153,7 @@ void FrameDetector::processAudio(const QByteArray& data)
 void FrameDetector::clipFrame(const RingBufferIterator& begin, const RingBufferIterator& end)
 {
     QVector<double> buffer;
-    for (auto it = begin; it != audio_buffer_.end(); ++it) {
+    for (auto it = begin; it != end; ++it) {
         buffer.push_back(*it);
     }
 

@@ -16,6 +16,9 @@ private slots:
     void setInputDevice(int index);
 
 private:
+    void closeEvent(QCloseEvent *event);
+
+private:
     FrameListWidget* frame_list_;
     QTextBrowser* frame_browser_;
     QLabel* decorded_packets_label_;

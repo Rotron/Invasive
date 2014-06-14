@@ -10,6 +10,9 @@ MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     settings_("Invasive", "settings")
 {
+    restoreGeometry(settings_.value("mainwindow/geometry").toByteArray());
+    restoreState(settings_.value("mainwindow/windowState").toByteArray());
+
     QVBoxLayout* vlayout = new QVBoxLayout();
     QWidget *widget = new QWidget();
     widget->setLayout(vlayout);
@@ -82,8 +85,6 @@ MainWindow::MainWindow(QWidget *parent) :
     setInputDevice(settings_.value("input_device", 0).toUInt());
     modem_->addDemodulatorFacory(std::make_shared<DefaultDemodulatorFactory>());
     modem_->addFrameDetector(std::make_shared<FrameDetector>(modem_->audioFormat()));
-
-    resize(800, 480);
 }
 
 MainWindow::~MainWindow()
@@ -111,3 +112,10 @@ void MainWindow::setInputDevice(int index)
     modem_->setAudioDeviceIndex(index);
     settings_.setValue("input_device", index);
 }
+
+void MainWindow::closeEvent(QCloseEvent *event)
+ {
+     settings_.setValue("mainwindow/geometry", saveGeometry());
+     settings_.setValue("mainwindow/windowState", saveState());
+     QMainWindow::closeEvent(event);
+ }

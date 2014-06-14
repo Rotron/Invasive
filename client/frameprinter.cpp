@@ -3,6 +3,21 @@
 
 namespace FramePrinter {
 
+QString asciiInfo(const FramePtr& frame)
+{
+    QByteArray text;
+    foreach (char c, frame->info()) {
+        // ascii
+        if (c >= 0x20 && c <= 0x7e) {
+            text += c;
+        }
+        else {
+            text += ".";
+        }
+    }
+    return QString::fromUtf8(text);
+}
+
 QString toPlainText(const FramePtr& frame)
 {
     QString text;
@@ -18,7 +33,7 @@ QString toPlainText(const FramePtr& frame)
         addresses += addr_str;
     }
     text += QString("%0\n\n").arg(addresses.join(" < "));
-    text += QString("%0\n\n").arg(frame->printableInfo());
+    text += QString("%0\n\n").arg(FramePrinter::asciiInfo(frame));
     text += frame->info().toHex() + "\n";
 
     return text;
@@ -41,7 +56,7 @@ QString toHtmlText(const FramePtr& frame)
     html += QString("<br>%0").arg(addresses.join(" < "));
     html += "</h4></font>";
 
-    html += "<div><br><font color=\"#dd0000\">" + QString("%0").arg(frame->printableInfo()) + "<br></font></div>";
+    html += "<div><br><font color=\"#dd0000\">" + QString("%0").arg(FramePrinter::asciiInfo(frame)) + "<br></font></div>";
     html += "<div>" + frame->info().toHex() + "</div>";
     html += "<hr>";
 

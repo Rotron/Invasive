@@ -1,5 +1,6 @@
 #include "framelistwidget.h"
 #include "frame.h"
+#include "frameprinter.h"
 
 Q_DECLARE_METATYPE(FramePtr);
 
@@ -157,7 +158,7 @@ void FrameListDelegate::paint(
         QRect text_rect = option.rect;
         text_rect.setTop(text_rect.top() + 20);
         text_rect.setLeft(160);
-        painter->drawText(text_rect, frame->printableInfo(), text_option);
+        painter->drawText(text_rect, FramePrinter::asciiInfo(frame), text_option);
     }
 
     QLinearGradient gradient(option.rect.right() - 150, 0, option.rect.right(), 0);

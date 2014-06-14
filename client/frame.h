@@ -20,7 +20,6 @@ public:
     QDateTime datetime() const;
     QString sha1() const;
     QByteArray info() const;
-    QString printableInfo() const;
     QList<Address> addresses() const;
     static bool verify(const QByteArray& data);
 

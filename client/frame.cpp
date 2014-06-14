@@ -112,21 +112,6 @@ QByteArray Frame::info() const
     return info_;
 }
 
-QString Frame::printableInfo() const
-{
-    QByteArray text;
-    foreach (char c, info_) {
-        // ascii
-        if (c >= 0x20 && c <= 0x7e) {
-            text += c;
-        }
-        else {
-            text += ".";
-        }
-    }
-    return QString::fromUtf8(text);
-}
-
 QList<Frame::Address> Frame::addresses() const
 {
     return addresses_;

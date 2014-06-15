@@ -23,7 +23,7 @@ private:
     ConfigDialog* config_dialog_;
     FrameListWidget* frame_list_;
     QTextBrowser* frame_browser_;
-    QLabel* decorded_packets_label_;
+    WaterfallView *waterfall_;
 
     Modem* modem_;
     SocketServer* server_;

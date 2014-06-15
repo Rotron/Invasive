@@ -6,6 +6,7 @@ class FrameListWidget;
 class ConfigDialog;
 class Modem;
 class SocketServer;
+class WaterfallView;
 
 class AbstractDemodulator;
 class DemodulatorFactoryInterface;

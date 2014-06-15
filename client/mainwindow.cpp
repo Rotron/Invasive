@@ -7,6 +7,7 @@
 #include "frameprinter.h"
 #include "configdialog.h"
 #include "socketserver.h"
+#include "waterfallview.h"
 
 namespace {
 
@@ -36,12 +37,15 @@ MainWindow::MainWindow(QWidget *parent) :
     splitter->setOrientation(Qt::Horizontal);
     vlayout->addWidget(splitter);
 
+    waterfall_ = new WaterfallView(this);
+    vlayout->addWidget(waterfall_);
+
     frame_list_ = new FrameListWidget(this);
     splitter->addWidget(frame_list_);
     connect(frame_list_, SIGNAL(itemSelectionChanged()), this, SLOT(selectionChanged()));
 
     QVBoxLayout* right_vlayout = new QVBoxLayout();
-    right_vlayout->setContentsMargins(0, 0, 0, 10);
+    right_vlayout->setContentsMargins(0, 0, 0, 0);
 
     frame_browser_ = new QTextBrowser(this);
     QFont font;
@@ -52,9 +56,6 @@ MainWindow::MainWindow(QWidget *parent) :
 
     QFormLayout* form = new QFormLayout();
     right_vlayout->addLayout(form);
-
-    decorded_packets_label_ = new QLabel("Decorded packets: 0", this);
-    form->addRow(decorded_packets_label_);
 
     QWidget *layout_widget = new QWidget(this);
     layout_widget->setLayout(right_vlayout);
@@ -67,6 +68,8 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(modem_, SIGNAL(frameDecorded(FramePtr)), frame_list_, SLOT(addFrame(FramePtr)));
     connect(modem_, SIGNAL(frameDecorded(FramePtr)), server_, SLOT(writeFrame(FramePtr)));
     connect(modem_, SIGNAL(frameDecorded(FramePtr)), this, SLOT(frameDecorded()));
+    connect(modem_, SIGNAL(audioSpectrumUpdated(QVector<float>)),
+            waterfall_, SLOT(updateAudioSpectrum(QVector<float>)));
 
     initializeMenuBar();
 }
@@ -78,7 +81,7 @@ MainWindow::~MainWindow()
 
 void MainWindow::frameDecorded()
 {
-    decorded_packets_label_->setText(QString("Decorded packets: %0").arg(frame_list_->count()));
+    waterfall_->setDecordedPackets(frame_list_->count());
 }
 
 void MainWindow::selectionChanged()

@@ -19,6 +19,7 @@ const double THRESHOLD_WIDTH_RATIO = 2.0;
 DefaultDemodulator::DefaultDemodulator(const FrameAudioPtr& frame_audio) :
     AbstractDemodulator(frame_audio)
 {
+
 }
 
 FramePtr DefaultDemodulator::exec(const FrameAudio& frame_audio)
@@ -69,21 +70,21 @@ FramePtr DefaultDemodulator::exec(const FrameAudio& frame_audio)
     double avg = (max + min) / 2.0;
 
     for (int i = 0; i <= THRESHOLD_RESOLUTION; ++i) {
-        QByteArray frame_data;
+        FramePtr frame;
         if (process(avg - std::fabs(avg - min / THRESHOLD_WIDTH_RATIO) *
-                    (1.0 * i / THRESHOLD_RESOLUTION), diff_buff, &frame_data)) {
-            return std::make_shared<Frame>(frame_audio.startTime(), frame_data);
+                    (1.0 * i / THRESHOLD_RESOLUTION), diff_buff, &frame)) {
+            if (frame) return frame;
         }
         if (process(avg + std::fabs(avg - max / THRESHOLD_WIDTH_RATIO) *
-                    (1.0 * i / THRESHOLD_RESOLUTION), diff_buff, &frame_data)) {
-            return std::make_shared<Frame>(frame_audio.startTime(), frame_data);
+                    (1.0 * i / THRESHOLD_RESOLUTION), diff_buff, &frame)) {
+            if (frame) return frame;
         }
     }
 
     return FramePtr();
 }
 
-bool DefaultDemodulator::process(double center, const QVector<double>& diff, QByteArray* frame)
+bool DefaultDemodulator::process(double center, const QVector<double>& diff, FramePtr* result)
 {
     QVector<bool> bit_buffer;
     RingBuffer<double> cb(BITS_PER_BYTE);
@@ -154,8 +155,8 @@ bool DefaultDemodulator::process(double center, const QVector<double>& diff, QBy
 
             if (c == '~') {
                 if (frame_data.size() > MINIMUM_FARME_BYTES) {
-                    if (Frame::verify(frame_data)) {
-                        *frame = frame_data;
+                    if (FramePtr frame = Frame::create(frame_audio_->startTime(), frame_data)) {
+                        *result = frame;
                         return true;
                     }
                     else {

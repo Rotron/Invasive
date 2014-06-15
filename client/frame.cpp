@@ -38,11 +38,21 @@ static const uint16_t crc16_table[] = {
     0x7bc7, 0x6a4e, 0x58d5, 0x495c, 0x3de3, 0x2c6a, 0x1ef1, 0x0f78
 };
 
-Frame::Frame(const QDateTime& datetime, const QByteArray& data) :
-    valid_(true),
+Frame::Frame(const QDateTime& datetime) :
     datetime_(datetime)
 {
-    valid_ = decode(data);
+
+}
+
+FramePtr Frame::create(const QDateTime& datetime, const QByteArray& data)
+{
+    FramePtr ptr = std::shared_ptr<Frame>(new Frame(datetime));
+    if (ptr->decode(data)) {
+        return ptr;
+    }
+    else {
+        return FramePtr();
+    }
 }
 
 bool Frame::decode(const QByteArray& data)
@@ -92,11 +102,6 @@ bool Frame::decode(const QByteArray& data)
     return true;
 }
 
-bool Frame::isValid() const
-{
-    return valid_;
-}
-
 QDateTime Frame::datetime() const
 {
     return datetime_;
@@ -115,22 +120,4 @@ QByteArray Frame::info() const
 QList<Frame::Address> Frame::addresses() const
 {
     return addresses_;
-}
-
-bool Frame::verify(const QByteArray& data)
-{
-    if (data.size() < 17) return false;
-
-    const uchar* data_ptr = reinterpret_cast<const uchar*>(data.data());
-    const uchar* data_ptr_end = data_ptr + data.size();
-    const uchar* fcs_ptr = data_ptr_end - sizeof(uint16_t);
-    uint16_t fcs = qFromLittleEndian<uint16_t>(fcs_ptr);
-
-    uint16_t crc = 0xffff;
-    for (size_t i = 0; i < data.size() - sizeof(uint16_t); ++i) {
-        crc = (crc >> 8) ^ crc16_table[(crc ^ data.at(i)) & 0xff];
-    }
-    crc ^= 0xffff;
-
-    return (fcs == crc);
 }

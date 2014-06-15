@@ -15,19 +15,19 @@ public:
     };
 
 public:
-    Frame(const QDateTime& datetime, const QByteArray& data);
-    bool isValid() const;
+    static FramePtr create(const QDateTime& datetime, const QByteArray& data);
     QDateTime datetime() const;
     QString sha1() const;
     QByteArray info() const;
     QList<Address> addresses() const;
-    static bool verify(const QByteArray& data);
+
+private:
+    Frame(const QDateTime& datetime);
 
 private:
     bool decode(const QByteArray& data);
 
 private:
-    bool valid_;
     QDateTime datetime_;
     QString sha1_;
     QByteArray info_;

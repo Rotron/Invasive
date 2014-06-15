@@ -16,7 +16,7 @@ signals:
 protected:
     virtual FramePtr exec(const FrameAudio& frame_audio) = 0;
 
-private:
+protected:
     FrameAudioPtr frame_audio_;
 
 };

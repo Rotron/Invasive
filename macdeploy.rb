@@ -13,7 +13,8 @@ contents = {
     "QtMultimedia.framework"   => { "Versions" => { "5" => ["@qt/lib/QtMultimedia.framework/QtMultimedia"] } },
     "QtNetwork.framework"      => { "Versions" => { "5" => ["@qt/lib/QtNetwork.framework/QtNetwork"] } },
     "QtXml.framework"          => { "Versions" => { "5" => ["@qt/lib/QtXml.framework/QtXml"] } },
-    "QtPrintSupport.framework" => { "Versions" => { "5" => ["@qt/lib/QtPrintSupport.framework/QtPrintSupport"] } }
+    "QtPrintSupport.framework" => { "Versions" => { "5" => ["@qt/lib/QtPrintSupport.framework/QtPrintSupport"] } },
+    "QtOpenGL.framework"       => { "Versions" => { "5" => ["@qt/lib/QtOpenGL.framework/QtOpenGL"] } }
   },
   "PlugIns" => {
     "accessible" => ["@qt/plugins/accessible/libqtaccessiblewidgets.dylib"],

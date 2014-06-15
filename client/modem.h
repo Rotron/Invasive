@@ -20,6 +20,7 @@ private:
 
 signals:
     void frameDecorded(const FramePtr& frame);
+    void audioSpectrumUpdated(const QVector<float>& data);
 
 private slots:
     void readSoundData();

@@ -4,9 +4,13 @@
 #include "frameaudio.h"
 #include "frame.h"
 
+extern "C" void rdft(int, int, double *, int *, double *);
+
 namespace {
 
 const int SAMPLING_RATE = 48000;
+const int FFT_SIZE      = 2048;
+const int FFT_GAIN      = 2000;
 
 }
 
@@ -102,6 +106,21 @@ void Modem::readSoundData()
         for (const auto& d : detectors_) {
             QMetaObject::invokeMethod(d.get(), "processAudio", Qt::QueuedConnection, Q_ARG(QByteArray, audio));
         }
+
+        QVector<float> spectrum(FFT_SIZE, 0);
+        for (int i = 0; i < audio.size() / FFT_SIZE / 2; ++i) {
+            QVector<double> signal(FFT_SIZE, 0);
+            for (int j = 0; j < FFT_SIZE; ++j) {
+                signal[j] = ((short*)audio.data())[j + FFT_SIZE * i] ;
+            }
+            static int fft_ip[FFT_SIZE / 2] = {0};
+            static double fft_w[FFT_SIZE / 2] = {0};
+            rdft(FFT_SIZE, -1, signal.data(), fft_ip, fft_w);
+            for (int j = 0; j < FFT_SIZE; ++j) {
+                spectrum[j] += signal[j] / (audio.size() / FFT_SIZE) / FFT_GAIN;
+            }
+        }
+        emit audioSpectrumUpdated(spectrum.mid(0, FFT_SIZE / 2));
     }
 }
 

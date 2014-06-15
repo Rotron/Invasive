@@ -1,4 +1,4 @@
-QT       += core gui multimedia
+QT       += core gui multimedia opengl
 CONFIG   += precompile_header
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
@@ -20,7 +20,9 @@ SOURCES += \
     framedetector.cpp \
     frameprinter.cpp \
     configdialog.cpp \
-    socketserver.cpp
+    socketserver.cpp \
+    waterfallview.cpp \
+    ../vendor/fft/fftsg.c
 
 HEADERS  += \
     mainwindow.h \
@@ -38,7 +40,8 @@ HEADERS  += \
     ringbuffer.h \
     frameprinter.h \
     configdialog.h \
-    socketserver.h
+    socketserver.h \
+    waterfallview.h
 
 PRECOMPILED_HEADER = stdafx.h
 precompile_header:!isEmpty(PRECOMPILED_HEADER) {

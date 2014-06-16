@@ -11,7 +11,7 @@ public:
     void run();
 
 signals:
-    void decorded(FramePtr);
+    void Decoded(FramePtr);
 
 protected:
     virtual FramePtr exec(const FrameAudio& frame_audio) = 0;

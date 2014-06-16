@@ -65,11 +65,13 @@ MainWindow::MainWindow(QWidget *parent) :
     splitter->setStretchFactor(1, 3);
 
     modem_ = new Modem(this);
-    connect(modem_, SIGNAL(frameDecorded(FramePtr)), frame_list_, SLOT(addFrame(FramePtr)));
-    connect(modem_, SIGNAL(frameDecorded(FramePtr)), server_, SLOT(writeFrame(FramePtr)));
-    connect(modem_, SIGNAL(frameDecorded(FramePtr)), this, SLOT(frameDecorded()));
+    connect(modem_, SIGNAL(frameDecoded(FramePtr)), frame_list_, SLOT(addFrame(FramePtr)));
+    connect(modem_, SIGNAL(frameDecoded(FramePtr)), server_, SLOT(writeFrame(FramePtr)));
+    connect(modem_, SIGNAL(frameDecoded(FramePtr)), this, SLOT(frameDecoded()));
     connect(modem_, SIGNAL(audioSpectrumUpdated(QVector<float>)),
             waterfall_, SLOT(updateAudioSpectrum(QVector<float>)));
+    connect(modem_, SIGNAL(decodeRatioUpdated(double)),
+            waterfall_, SLOT(setDecodeRatio(double)));
 
     initializeMenuBar();
 }
@@ -79,9 +81,9 @@ MainWindow::~MainWindow()
 
 }
 
-void MainWindow::frameDecorded()
+void MainWindow::frameDecoded()
 {
-    waterfall_->setDecordedPackets(frame_list_->count());
+    waterfall_->setDecodedPackets(frame_list_->count());
 }
 
 void MainWindow::selectionChanged()

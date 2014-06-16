@@ -9,7 +9,8 @@ const int VIEW_HEIGHT = 140;
 WaterfallView::WaterfallView(QWidget *parent) :
     QGLWidget(QGLFormat(QGL::SampleBuffers), parent),
     count_(0),
-    decorded_packets_(0)
+    decoded_packets_(0),
+    decode_ratio_(0)
 {
     setAutoFillBackground(false);
     setMinimumHeight(VIEW_HEIGHT);
@@ -24,9 +25,14 @@ void WaterfallView::updateAudioSpectrum(const QVector<float>& data)
     line_buffer_ = data;
 }
 
-void WaterfallView::setDecordedPackets(int count)
+void WaterfallView::setDecodedPackets(int count)
 {
-    decorded_packets_ = count;
+    decoded_packets_ = count;
+}
+
+void WaterfallView::setDecodeRatio(double ratio)
+{
+    decode_ratio_ = ratio;
 }
 
 void WaterfallView::animate()
@@ -109,10 +115,19 @@ void WaterfallView::paintEvent(QPaintEvent *event)
     QPainter painter(this);
     painter.setRenderHint(QPainter::Antialiasing);
     painter.setPen(Qt::white);
-    QRect text_rect = rect();
-    text_rect.setTop(text_rect.top() + 8);
-    text_rect.setRight(text_rect.right() - 10);
-    painter.drawText(text_rect, Qt::AlignRight, QString("Decorded packets: %0").arg(decorded_packets_));
+    {
+        QRect text_rect = rect();
+        text_rect.setTop(text_rect.top() + 8);
+        text_rect.setRight(text_rect.right() - 10);
+        painter.drawText(text_rect, Qt::AlignRight, QString("Decoded packets: %0").arg(decoded_packets_));
+    }
+    {
+        QRect text_rect = rect();
+        text_rect.setTop(text_rect.top() + 28);
+        text_rect.setRight(text_rect.right() - 10);
+        painter.drawText(text_rect, Qt::AlignRight,
+                         QString("Decode ratio: %0%").arg(QString::number(decode_ratio_ * 100 ,'f', 2)));
+    }
     painter.end();
 }
 

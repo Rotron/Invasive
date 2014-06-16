@@ -16,7 +16,9 @@ const int FFT_GAIN      = 2000;
 
 Modem::Modem(QObject *parent) :
     QObject(parent),
-    audio_input_(nullptr)
+    audio_input_(nullptr),
+    detected_count_(0),
+    Decoded_count_(0)
 {
     qRegisterMetaType<FramePtr>("FramePtr");
     qRegisterMetaType<FrameAudioPtr>("FrameAudioPtr");
@@ -125,10 +127,12 @@ void Modem::frameDetected(const FrameAudioPtr& frame)
 {
     for (const auto& f : factories_) {
         if (AbstractDemodulator *demodulator = f->make(std::make_shared<FrameAudio>(*frame))) {
-            connect(demodulator, SIGNAL(decorded(FramePtr)), this, SLOT(decoded(FramePtr)));
+            connect(demodulator, SIGNAL(Decoded(FramePtr)), this, SLOT(decoded(FramePtr)));
             thread_pool_.start(demodulator);
         }
     }
+    detected_count_++;
+    emit decodeRatioUpdated(1.0 * Decoded_count_ / detected_count_);
 }
 
 void Modem::addFrameDetector(const FrameDetectorPtr& detector)
@@ -149,9 +153,11 @@ void Modem::addDemodulatorFacory(const DemodulatorFactoryPtr& factory)
 
 void Modem::decoded(const FramePtr& frame)
 {
-    QDateTime last_decorded = last_frame_map_[frame->sha1()];
-    if (last_decorded.isNull() || last_decorded.secsTo(frame->datetime()) > 5) {
+    QDateTime last_Decoded = last_frame_map_[frame->sha1()];
+    if (last_Decoded.isNull() || last_Decoded.secsTo(frame->datetime()) > 5) {
         last_frame_map_[frame->sha1()] = frame->datetime();
-        emit frameDecorded(frame);
+        emit frameDecoded(frame);
     }
+    Decoded_count_++;
+    emit decodeRatioUpdated(1.0 * Decoded_count_ / detected_count_);
 }

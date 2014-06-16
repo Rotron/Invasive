@@ -19,8 +19,9 @@ private:
     static QList<QAudioDeviceInfo> availableDevices();
 
 signals:
-    void frameDecorded(const FramePtr& frame);
+    void frameDecoded(const FramePtr& frame);
     void audioSpectrumUpdated(const QVector<float>& data);
+    void decodeRatioUpdated(double ratio);
 
 private slots:
     void readSoundData();
@@ -38,5 +39,7 @@ private:
     QThread detector_thread_;
 
     QMap<QString, QDateTime> last_frame_map_;
+    int detected_count_;
+    int Decoded_count_;
 
 };

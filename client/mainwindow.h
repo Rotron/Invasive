@@ -11,7 +11,7 @@ public:
     ~MainWindow();
 
 private slots:
-    void frameDecorded();
+    void frameDecoded();
     void selectionChanged();
     void setInputDevice(int index);
 

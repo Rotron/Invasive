@@ -12,6 +12,7 @@ const int FRAME_FLAG_BUFFER_SIZE  = (FRAME_FLAG_LENGTH + 1) * BITS_PER_BYTE;
 const int THRESHOLD_BUFFER_SIZE   = 8;
 const int DELAY_SAMPLES           = SAMPLING_RATE / 1200 * 200;
 const int MINIMUM_BIT_LENGTH      = 2000;
+const int MINIMUM_LEVEL           = 10.0;
 
 const double LEVEL_DECREASE_SPEED = 1.0;
 const double FRAME_STOP_SN_RATIO  = 2.0;
@@ -85,6 +86,10 @@ void FrameDetector::processAudio(const QByteArray& data)
         double level = low - high;
 
         bufflag_.push_back(level);
+
+        if (noise_level_ < MINIMUM_LEVEL) {
+            continue;
+        }
 
         if (count % SN_LEVEL_BUFFER_SIZE == 0) {
             double signal = bufsignal_.sum();

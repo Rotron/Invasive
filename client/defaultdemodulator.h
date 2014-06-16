@@ -12,7 +12,7 @@ protected:
     FramePtr exec(const FrameAudio& frame_audio);
 
 private:
-    bool process(double center, const QVector<double>& diff, FramePtr* result);
+    void process(double center, const QVector<double>& diff, FramePtr* result);
 
 };
 

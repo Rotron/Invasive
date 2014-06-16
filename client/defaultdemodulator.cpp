@@ -71,20 +71,18 @@ FramePtr DefaultDemodulator::exec(const FrameAudio& frame_audio)
 
     for (int i = 0; i <= THRESHOLD_RESOLUTION; ++i) {
         FramePtr frame;
-        if (process(avg - std::fabs(avg - min / THRESHOLD_WIDTH_RATIO) *
-                    (1.0 * i / THRESHOLD_RESOLUTION), diff_buff, &frame)) {
-            if (frame) return frame;
-        }
-        if (process(avg + std::fabs(avg - max / THRESHOLD_WIDTH_RATIO) *
-                    (1.0 * i / THRESHOLD_RESOLUTION), diff_buff, &frame)) {
-            if (frame) return frame;
-        }
+        process(avg - std::fabs(avg - min / THRESHOLD_WIDTH_RATIO) *
+                (1.0 * i / THRESHOLD_RESOLUTION), diff_buff, &frame);
+        if (frame) return frame;
+        process(avg + std::fabs(avg - max / THRESHOLD_WIDTH_RATIO) *
+                (1.0 * i / THRESHOLD_RESOLUTION), diff_buff, &frame);
+        if (frame) return frame;
     }
 
     return FramePtr();
 }
 
-bool DefaultDemodulator::process(double center, const QVector<double>& diff, FramePtr* result)
+void DefaultDemodulator::process(double center, const QVector<double>& diff, FramePtr* result)
 {
     QVector<bool> bit_buffer;
     RingBuffer<double> cb(BITS_PER_BYTE);
@@ -157,10 +155,10 @@ bool DefaultDemodulator::process(double center, const QVector<double>& diff, Fra
                 if (frame_data.size() > MINIMUM_FARME_BYTES) {
                     if (FramePtr frame = Frame::create(frame_audio_->startTime(), frame_data)) {
                         *result = frame;
-                        return true;
+                        return;
                     }
                     else {
-                        return false;
+                        return;
                     }
                 }
             }
@@ -177,7 +175,7 @@ bool DefaultDemodulator::process(double center, const QVector<double>& diff, Fra
         }
     }
 
-    return false;
+    return;
 }
 
 AbstractDemodulator* DefaultDemodulatorFactory::make(const FrameAudioPtr& frame_audio) const

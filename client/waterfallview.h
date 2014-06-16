@@ -11,6 +11,7 @@ public:
 private:
     void paintEvent(QPaintEvent *event);
     void initializeGL();
+    void setupShader();
 
 public slots:
     void updateAudioSpectrum(const QVector<float>& data);
@@ -25,6 +26,7 @@ private:
     GLuint line_texture_;
     GLuint textures_[2];
     GLuint framebuffers_[2];
+    GLuint program_;
     int count_;
     QVector<float> line_buffer_;
 

@@ -94,6 +94,7 @@ void WaterfallView::paintEvent(QPaintEvent *event)
     glEnd();
     glDisable(GL_TEXTURE_2D);
 
+    glUseProgram(program_);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glViewport(0, 0, rect().width(), rect().height());
     glClear(GL_COLOR_BUFFER_BIT);
@@ -111,6 +112,7 @@ void WaterfallView::paintEvent(QPaintEvent *event)
     glVertex2d(-1.0,  1.0);
     glEnd();
     glDisable(GL_TEXTURE_2D);
+    glUseProgram(0);
 
     QPainter painter(this);
     painter.setRenderHint(QPainter::Antialiasing);
@@ -177,4 +179,47 @@ void WaterfallView::initializeGL()
     glClear(GL_COLOR_BUFFER_BIT);
     glBindFramebuffer(GL_FRAMEBUFFER, framebuffers_[1]);
     glClear(GL_COLOR_BUFFER_BIT);
+
+    setupShader();
+}
+
+void WaterfallView::setupShader()
+{
+    GLuint vert = glCreateShader(GL_VERTEX_SHADER);
+    GLuint frag = glCreateShader(GL_FRAGMENT_SHADER);
+
+    static const GLchar *vert_source[] = {
+        "void main(void)",
+        "{",
+        "  gl_Position = ftransform();",
+        "  gl_TexCoord[0] = gl_MultiTexCoord0;"
+        "}",
+    };
+    glShaderSource(vert, sizeof(vert_source) / sizeof(vert_source[0]), vert_source, NULL);
+
+    static const GLchar *frag_source[] = {
+        "uniform sampler2D texture;",
+        "void main(void)",
+        "{",
+        "  const vec4 color1 = vec4(0.1, 0.1, 0.1, 1.0);"
+        "  const vec4 color2 = vec4(0.1, 1.0, 0.1, 1.0);"
+        "  const vec4 color3 = vec4(1.0, 1.0, 1.0, 1.0);"
+        "  float value = texture2D(texture, gl_TexCoord[0].xy).r;"
+        "  if (value > 0.66) gl_FragColor = color3;",
+        "  if (value > 0.33) gl_FragColor = mix(color2, color3, (value - 0.33) / 0.33);",
+        "  else gl_FragColor = mix(color1, color2, value / 0.33);",
+        "}",
+    };
+    glShaderSource(frag, sizeof(frag_source) / sizeof(frag_source[0]), frag_source, NULL);
+
+    glCompileShader(vert);
+    glCompileShader(frag);
+
+    program_ = glCreateProgram();
+    glAttachShader(program_, vert);
+    glAttachShader(program_, frag);
+
+    glLinkProgram(program_);
+    glDeleteShader(vert);
+    glDeleteShader(frag);
 }

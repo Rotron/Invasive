@@ -10,7 +10,7 @@ namespace {
 
 const int SAMPLING_RATE = 48000;
 const int FFT_SIZE      = 2048;
-const int FFT_GAIN      = 2000;
+const int FFT_GAIN      = 20000;
 
 }
 
@@ -63,7 +63,7 @@ bool Modem::setAudioDeviceIndex(int index)
         qDebug() << "threads:     " << thread_pool_.maxThreadCount();
 
         audio_input_.reset(new QAudioInput(device, format));
-        audio_input_->setNotifyInterval(20);
+        audio_input_->setNotifyInterval(40);
 
         connect(audio_input_.data(), SIGNAL(notify()), this, SLOT(readSoundData()));
         audio_device_ = audio_input_->start();

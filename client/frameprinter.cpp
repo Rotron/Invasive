@@ -56,7 +56,7 @@ QString toHtmlText(const FramePtr& frame)
         if (addr.repeated) addr_str += "R";
         addresses += addr_str;
     }
-    html += QString("<br>%0").arg(addresses.join(" < "));
+    html += QString("<br>%0").arg(addresses.join(QString(" < ").toHtmlEscaped()));
     html += "</h4></font>";
 
     html += "<div><br><font color=\"#dd0000\">" + QString("%0").arg(FramePrinter::asciiInfo(frame)) + "<br></font></div>";

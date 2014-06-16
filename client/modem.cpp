@@ -61,10 +61,7 @@ bool Modem::setAudioDeviceIndex(int index)
         qDebug() << "threads:     " << thread_pool_.maxThreadCount();
 
         audio_input_.reset(new QAudioInput(device, format));
-        audio_input_->setNotifyInterval(10);
-
-        int interval = (1000.0 * audio_input_->bufferSize()) / format.bytesForDuration(1000000);
-        audio_input_->setNotifyInterval(interval);
+        audio_input_->setNotifyInterval(20);
 
         connect(audio_input_.data(), SIGNAL(notify()), this, SLOT(readSoundData()));
         audio_device_ = audio_input_->start();

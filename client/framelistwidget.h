@@ -13,8 +13,13 @@ public slots:
     void addFrame(const FramePtr& frame);
 
 private slots:
+    void showContextMenu(const QPoint &pos);
     void scrollChanged();
     void scrollToBottom();
+    void copyText();
+    void copyJson();
+    void copyAsciiInfo();
+    void copyHexInfo();
 
 private:
     void resizeEvent(QResizeEvent* event);

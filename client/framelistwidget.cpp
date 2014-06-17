@@ -1,6 +1,7 @@
 #include "framelistwidget.h"
 #include "frame.h"
 #include "frameprinter.h"
+#include <QClipboard>
 
 Q_DECLARE_METATYPE(FramePtr);
 
@@ -17,6 +18,7 @@ FrameListWidget::FrameListWidget(QWidget *parent) :
     setSelectionMode(QAbstractItemView::ExtendedSelection);
 
     connect(verticalScrollBar(), SIGNAL(valueChanged(int)), this, SLOT(scrollChanged()));
+    connect(this, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(showContextMenu(const QPoint&)));
 }
 
 QList<FramePtr> FrameListWidget::getFrames()
@@ -39,6 +41,37 @@ void FrameListWidget::addFrame(const FramePtr& frame)
     }
 }
 
+void FrameListWidget::showContextMenu(const QPoint &pos)
+{
+    QList<QListWidgetItem*> list = selectedItems();
+    if (!list.isEmpty()) {
+        QMenu *menu = new QMenu();
+
+        QAction *copy_text_action = new QAction(tr("Copy Text"), this);
+        connect(copy_text_action, SIGNAL(triggered()), this, SLOT(copyText()));
+        menu->addAction(copy_text_action);
+
+        QAction *copy_json_action = new QAction(tr("Copy JSON"), this);
+        connect(copy_json_action, SIGNAL(triggered()), this, SLOT(copyJson()));
+        menu->addAction(copy_json_action);
+
+        if (list.size() == 1) {
+            menu->addSeparator();
+
+            QAction *copy_ascii_info_action = new QAction(tr("Copy ASCII Info"), this);
+            connect(copy_ascii_info_action, SIGNAL(triggered()), this, SLOT(copyAsciiInfo()));
+            menu->addAction(copy_ascii_info_action);
+
+            QAction *copy_hex_info_action = new QAction(tr("Copy Hex Info"), this);
+            connect(copy_hex_info_action, SIGNAL(triggered()), this, SLOT(copyHexInfo()));
+            menu->addAction(copy_hex_info_action);
+        }
+
+        menu->exec(mapToGlobal(pos));
+        delete menu;
+    }
+}
+
 void FrameListWidget::scrollChanged()
 {
     QScrollBar *v = verticalScrollBar();
@@ -49,6 +82,42 @@ void FrameListWidget::scrollToBottom()
 {
     QScrollBar *v = verticalScrollBar();
     v->setValue(v->maximum());
+}
+
+void FrameListWidget::copyText()
+{
+    QString text;
+    foreach (const QListWidgetItem* item, selectedItems()) {
+        if (FramePtr frame = qvariant_cast<FramePtr>(item->data(Qt::UserRole))) {
+            text += FramePrinter::toPlainText(frame) + "\n\n";
+        }
+    }
+    QApplication::clipboard()->setText(text);
+}
+
+void FrameListWidget::copyJson()
+{
+    QString json;
+    foreach (const QListWidgetItem* item, selectedItems()) {
+        if (FramePtr frame = qvariant_cast<FramePtr>(item->data(Qt::UserRole))) {
+            json += FramePrinter::toJson(frame) + "\n";
+        }
+    }
+    QApplication::clipboard()->setText(json);
+}
+
+void FrameListWidget::copyAsciiInfo()
+{
+    if (FramePtr frame = qvariant_cast<FramePtr>(selectedItems().first()->data(Qt::UserRole))) {
+        QApplication::clipboard()->setText(FramePrinter::asciiInfo(frame));
+    }
+}
+
+void FrameListWidget::copyHexInfo()
+{
+    if (FramePtr frame = qvariant_cast<FramePtr>(selectedItems().first()->data(Qt::UserRole))) {
+        QApplication::clipboard()->setText(frame->info().toHex());
+    }
 }
 
 void FrameListWidget::resizeEvent(QResizeEvent*)

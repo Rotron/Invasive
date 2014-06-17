@@ -1,4 +1,4 @@
-#include "FIRFilter.h"
+#include "firfilter.h"
 
 static const double PHI = M_PI;
 

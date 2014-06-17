@@ -136,7 +136,7 @@ void WaterfallView::paintEvent(QPaintEvent *event)
 void WaterfallView::initializeGL()
 {
     QGLWidget::initializeGL();
-#ifdef Q_OS_WIN32
+#if defined(Q_OS_WIN32) || defined(Q_OS_LINUX)
     glewInit();
 #endif
 

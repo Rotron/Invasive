@@ -44,6 +44,7 @@ HEADERS  += \
     waterfallview.h
 
 win32:LIBS += -lglew32
+linux:LIBS += -lGLEW
 
 PRECOMPILED_HEADER = stdafx.h
 precompile_header:!isEmpty(PRECOMPILED_HEADER) {

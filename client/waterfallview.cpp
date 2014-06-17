@@ -136,6 +136,9 @@ void WaterfallView::paintEvent(QPaintEvent *event)
 void WaterfallView::initializeGL()
 {
     QGLWidget::initializeGL();
+#ifdef Q_OS_WIN32
+    glewInit();
+#endif
 
     makeCurrent();
     static QColor white(0, 0, 0);

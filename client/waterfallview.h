@@ -1,4 +1,7 @@
 #pragma once
+#ifdef Q_OS_WIN32
+#include <gl/glew.h>
+#endif
 #include <QGLWidget>
 #include "stdafx.h"
 

@@ -43,6 +43,8 @@ HEADERS  += \
     socketserver.h \
     waterfallview.h
 
+win32:LIBS += -lglew32
+
 PRECOMPILED_HEADER = stdafx.h
 precompile_header:!isEmpty(PRECOMPILED_HEADER) {
     DEFINES += USING_PCH

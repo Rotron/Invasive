@@ -3,7 +3,7 @@
 #include <numeric>
 
 #define _USE_MATH_DEFINES
-#include <cmath>
+#include <math.h>
 
 #include <QObject>
 #include <QFile>

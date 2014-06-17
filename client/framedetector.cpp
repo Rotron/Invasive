@@ -114,8 +114,11 @@ void FrameDetector::processAudio(const QByteArray& data)
                 for (int j = 0; j < BITS_PER_BYTE; ++j) {
                     uint32_t frag_sequence = 0;
                     for (int k = 0; k < FRAME_FLAG_LENGTH; ++k) {
-                        double level = std::accumulate(bufflag_.begin() + j + k * BITS_PER_BYTE,
-                                                       bufflag_.begin() + j + (k + 1) * BITS_PER_BYTE, 0.0);
+                        double level = 0;
+                        for (auto it = bufflag_.begin() + j + k * BITS_PER_BYTE;
+                             it != bufflag_.begin() + j + (k + 1) * BITS_PER_BYTE; ++it) {
+                            level += *it;
+                        }
                         bool bit = ((level / BITS_PER_BYTE) < 0);
                         frag_sequence <<= 1;
                         if (bit) {

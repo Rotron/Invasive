@@ -16,6 +16,19 @@ JSON-encoded frame data is available on TCP port 19780 (by default)
 {"addresses":[{"callsign":"GPSLJ","repeated":false,"ssid":0},{"callsign":"N6QFD","repeated":false,"ssid":9},{"callsign":"N6EX","repeated":true,"ssid":5}],"datetime":"2014-06-14T22:17:18","info-ascii":"$GPRMC,013714,A,3408.6360,N,11812.0716,W,0.0,88.1,231105,13.5,E,D*09..","info-hex":"244750524d432c3031333731342c412c333430382e363336302c4e2c31313831322e303731362c572c302e302c38382e312c3233313130352c31332e352c452c442a30390d0a"}
 ```
 
+## Build Requirements
+
+### Mac OS X
+
+* Xcode 5.1.1
+* Qt 5.3
+
+### Windows
+
+* Visual Studio 2013
+* Qt 5.3
+* GLEW 1.10.0
+
 ## License
 
 Copyright (C) 2014  h2so5

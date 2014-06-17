@@ -52,5 +52,6 @@ precompile_header:!isEmpty(PRECOMPILED_HEADER) {
 
 OTHER_FILES += Info.plist
 ICON = ../icon/invasive.icns
+RC_FILE = ../icon/icon.rc
 
 include(../common.pri)

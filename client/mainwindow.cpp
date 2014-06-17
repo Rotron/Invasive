@@ -134,6 +134,13 @@ void MainWindow::initializeMenuBar()
     }
     connect(mapper, SIGNAL(mapped(int)), this, SLOT(setInputDevice(int)));
 
+    QMenu *tool_menu = menu->addMenu(tr("Tools"));
+    QAction *configAct = new QAction(tr("Preferences..."), this);
+    configAct->setShortcut(QKeySequence("Ctrl+K"));
+    configAct->setMenuRole(QAction::PreferencesRole);
+    connect(configAct, SIGNAL(triggered()), config_dialog_, SLOT(show()));
+    tool_menu->addAction(configAct);
+
     QMenu *help_menu = menu->addMenu(tr("Help"));
     QAction *about_qt_act = new QAction(tr("About Qt..."), this);
     about_qt_act->setMenuRole(QAction::AboutQtRole);
@@ -143,11 +150,4 @@ void MainWindow::initializeMenuBar()
     setInputDevice(settings_.value("input_device", 0).toUInt());
     modem_->addDemodulatorFacory(std::make_shared<DefaultDemodulatorFactory>());
     modem_->addFrameDetector(std::make_shared<FrameDetector>(modem_->audioFormat()));
-
-    QMenu *tool_menu = menu->addMenu(tr("Tools"));
-    QAction *configAct = new QAction(tr("Preferences..."), this);
-    configAct->setShortcut(QKeySequence("Ctrl+K"));
-    configAct->setMenuRole(QAction::PreferencesRole);
-    connect(configAct, SIGNAL(triggered()), config_dialog_, SLOT(show()));
-    tool_menu->addAction(configAct);
 }

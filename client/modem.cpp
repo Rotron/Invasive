@@ -9,7 +9,7 @@ extern "C" void rdft(int, int, double *, int *, double *);
 namespace {
 
 const int SAMPLING_RATE = 48000;
-const int FFT_SIZE      = 2048;
+const int FFT_SIZE      = 1024;
 const int FFT_GAIN      = 20000;
 
 }

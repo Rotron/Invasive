@@ -22,7 +22,8 @@ SOURCES += \
     configdialog.cpp \
     socketserver.cpp \
     waterfallview.cpp \
-    ../vendor/fft/fftsg.c
+    ../vendor/fft/fftsg.c \
+    framelogger.cpp
 
 HEADERS  += \
     mainwindow.h \
@@ -41,7 +42,8 @@ HEADERS  += \
     frameprinter.h \
     configdialog.h \
     socketserver.h \
-    waterfallview.h
+    waterfallview.h \
+    framelogger.h
 
 win32:LIBS += -lglew32
 

@@ -16,6 +16,7 @@ private slots:
     void setInputDevice(int index);
 
 private:
+    void initializeSettings();
     void initializeMenuBar();
     void closeEvent(QCloseEvent *event);
 
@@ -27,6 +28,7 @@ private:
 
     Modem* modem_;
     SocketServer* server_;
+    FrameLogger* logger_;
     QActionGroup* input_action_group_;
     QSettings settings_;
 

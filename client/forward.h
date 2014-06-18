@@ -7,6 +7,7 @@ class ConfigDialog;
 class Modem;
 class SocketServer;
 class WaterfallView;
+class FrameLogger;
 
 class AbstractDemodulator;
 class DemodulatorFactoryInterface;

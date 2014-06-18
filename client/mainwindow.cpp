@@ -8,6 +8,7 @@
 #include "configdialog.h"
 #include "socketserver.h"
 #include "waterfallview.h"
+#include "framelogger.h"
 
 namespace {
 
@@ -19,12 +20,10 @@ MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     settings_("Invasive", "settings")
 {
+    initializeSettings();
+
     restoreGeometry(settings_.value("mainwindow/geometry").toByteArray());
     restoreState(settings_.value("mainwindow/windowState").toByteArray());
-
-    quint16 port = settings_.value("server/listen_port", DEFAULT_LISTEN_PORT).toUInt();
-    settings_.setValue("server/listen_port", port);
-    server_ = new SocketServer(port, this);
 
     config_dialog_ = new ConfigDialog(this);
 
@@ -73,6 +72,10 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(modem_, SIGNAL(decodeRatioUpdated(double)),
             waterfall_, SLOT(setDecodeRatio(double)));
 
+    QString log_path = settings_.value("log/path").toString();
+    logger_ = new FrameLogger(log_path, this);
+    connect(modem_, SIGNAL(frameDecoded(FramePtr)), logger_, SLOT(writeFrame(FramePtr)));
+
     initializeMenuBar();
 }
 
@@ -107,6 +110,17 @@ void MainWindow::closeEvent(QCloseEvent *event)
     settings_.setValue("mainwindow/geometry", saveGeometry());
     settings_.setValue("mainwindow/windowState", saveState());
     QMainWindow::closeEvent(event);
+}
+
+void MainWindow::initializeSettings()
+{
+    quint16 port = settings_.value("server/listen_port", DEFAULT_LISTEN_PORT).toUInt();
+    settings_.setValue("server/listen_port", port);
+    server_ = new SocketServer(port, this);
+
+    QString default_path = QDir::homePath() + "/invasive.log.txt";
+    QString log_path = settings_.value("log/path", default_path).toString();
+    settings_.setValue("log/path", log_path);
 }
 
 void MainWindow::initializeMenuBar()

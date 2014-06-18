@@ -12,6 +12,9 @@
 #include <QVector>
 #include <QDateTime>
 #include <QDebug>
+#include <QDialog>
+#include <QLineEdit>
+#include <QDir>
 #include <QMetaObject>
 #include <QtEndian>
 #include <QCryptographicHash>

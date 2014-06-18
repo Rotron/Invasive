@@ -32,7 +32,7 @@ private:
     uint64_t prev_count_;
     double level_;
     double signal_level_;
-    double noise_level_;
+    double input_level_;
     double threshold_;
 
 private:

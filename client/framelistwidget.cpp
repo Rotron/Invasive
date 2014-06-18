@@ -89,7 +89,7 @@ void FrameListWidget::copyText()
     QString text;
     foreach (const QListWidgetItem* item, selectedItems()) {
         if (FramePtr frame = qvariant_cast<FramePtr>(item->data(Qt::UserRole))) {
-            text += FramePrinter::toPlainText(frame) + "\n\n";
+            text += FramePrinter::toPlainText(frame) + "\n";
         }
     }
     QApplication::clipboard()->setText(text);

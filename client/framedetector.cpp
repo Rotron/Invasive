@@ -39,7 +39,7 @@ FrameDetector::FrameDetector(const QAudioFormat& format, QObject *parent) :
     prev_count_(0),
     level_(0.0),
     signal_level_(0.0),
-    noise_level_(0.0),
+    input_level_(0.0),
     threshold_(0)
 {
 
@@ -73,12 +73,12 @@ void FrameDetector::processAudio(const QByteArray& data)
         double ns = std::fabs(sample);
 
         if (signal_level_ >= LEVEL_DECREASE_SPEED) signal_level_ -= LEVEL_DECREASE_SPEED;
-        if (noise_level_  >= LEVEL_DECREASE_SPEED) noise_level_  -= LEVEL_DECREASE_SPEED;
+        if (input_level_  >= LEVEL_DECREASE_SPEED) input_level_  -= LEVEL_DECREASE_SPEED;
 
         signal_level_ = std::max(signal_level_, ss);
-        noise_level_ = std::max(noise_level_, ns);
+        input_level_ = std::max(input_level_, ns);
 
-        double ratio = (noise_level_ > 1.0) ? signal_level_ / noise_level_ : 1.0;
+        double ratio = (input_level_ > 1.0) ? signal_level_ / input_level_ : 1.0;
         bufsignal_.push_back(ratio);
 
         double low  = std::hypotf(bufs1200_.sum(), bufc1200_.sum());
@@ -87,7 +87,7 @@ void FrameDetector::processAudio(const QByteArray& data)
 
         bufflag_.push_back(level);
 
-        if (noise_level_ < MINIMUM_LEVEL) {
+        if (input_level_ < MINIMUM_LEVEL) {
             continue;
         }
 

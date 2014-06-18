@@ -1,6 +1,5 @@
 #pragma once
-
-#include <QDialog>
+#include "stdafx.h"
 
 class ConfigDialog : public QDialog
 {
@@ -16,6 +15,7 @@ public slots:
 
 private:
     QSettings settings_;
-    QSpinBox* portSpinBox_;
+    QSpinBox* port_spinbox_;
+    QLineEdit* logpath_edit_;
 
 };

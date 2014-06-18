@@ -1,4 +1,4 @@
-#include "FIRFilter.h"
+#include "firfilter.h"
 
 FIRFilter::FIRFilter(Type type, double sampling, double width, double edge1, double edge2)
 {

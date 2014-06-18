@@ -1,6 +1,6 @@
 #pragma once
-#ifdef Q_OS_WIN32
-#include <gl/glew.h>
+#if defined(Q_OS_WIN32) || defined(Q_OS_LINUX)
+#include <GL/glew.h>
 #endif
 #include <QGLWidget>
 #include "stdafx.h"

@@ -21,11 +21,20 @@ FrameListWidget::FrameListWidget(QWidget *parent) :
     connect(this, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(showContextMenu(const QPoint&)));
 }
 
-QList<FramePtr> FrameListWidget::getFrames()
+QList<FramePtr> FrameListWidget::getSelectedFrames()
 {
     QList<FramePtr> list;
     foreach (const QListWidgetItem* item, selectedItems()) {
         list.push_back(qvariant_cast<FramePtr>(item->data(Qt::UserRole)));
+    }
+    return list;
+}
+
+QList<FramePtr> FrameListWidget::getAllFrames()
+{
+    QList<FramePtr> list;
+    for (int i = 0; i < count(); ++i) {
+        list.push_back(qvariant_cast<FramePtr>(item(i)->data(Qt::UserRole)));
     }
     return list;
 }

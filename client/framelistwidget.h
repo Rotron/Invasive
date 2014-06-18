@@ -7,7 +7,8 @@ class FrameListWidget : public QListWidget
     Q_OBJECT
 public:
     explicit FrameListWidget(QWidget *parent = 0);
-    QList<FramePtr> getFrames();
+    QList<FramePtr> getSelectedFrames();
+    QList<FramePtr> getAllFrames();
 
 public slots:
     void addFrame(const FramePtr& frame);

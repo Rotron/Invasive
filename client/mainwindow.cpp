@@ -87,15 +87,18 @@ MainWindow::~MainWindow()
 void MainWindow::frameDecoded()
 {
     waterfall_->setDecodedPackets(frame_list_->count());
+    save_file_act_->setEnabled(frame_list_->count() > 0);
 }
 
 void MainWindow::selectionChanged()
 {
     QString html;
-    foreach (const FramePtr frame, frame_list_->getFrames()) {
+    foreach (const FramePtr frame, frame_list_->getSelectedFrames()) {
         html += FramePrinter::toHtmlText(frame);
     }
     frame_browser_->setHtml(html);
+
+    save_selected_act_->setEnabled(!frame_list_->getSelectedFrames().isEmpty());
 }
 
 void MainWindow::setInputDevice(int index)
@@ -103,6 +106,31 @@ void MainWindow::setInputDevice(int index)
     input_action_group_->actions().at(index)->setChecked(true);
     modem_->setAudioDeviceIndex(index);
     settings_.setValue("input_device", index);
+}
+
+void MainWindow::saveAsFile(bool selected)
+{
+    QString path = QFileDialog::getSaveFileName(
+                this, "Save as file", QDir::homePath() + "/log.txt", "Text (*.txt)");
+
+    QFile file(path);
+    if (file.open(QFile::WriteOnly | QFile::Text)) {
+        QList<FramePtr> frames;
+        if (selected) {
+            frames = frame_list_->getSelectedFrames();
+        }
+        else {
+            frames = frame_list_->getAllFrames();
+        }
+        foreach (const FramePtr frame, frames) {
+            file.write((FramePrinter::toPlainText(frame) + "\n").toUtf8());
+        }
+    }
+}
+
+void MainWindow::saveSelectedAsFile()
+{
+    saveAsFile(true);
 }
 
 void MainWindow::closeEvent(QCloseEvent *event)
@@ -127,6 +155,20 @@ void MainWindow::initializeMenuBar()
 {
     QMenuBar* menu = new QMenuBar;
     setMenuBar(menu);
+
+    QMenu* file_menu = new QMenu("File");
+    menu->addMenu(file_menu);
+
+    save_file_act_ = new QAction("Save as file...", this);
+    connect(save_file_act_, SIGNAL(triggered()), this, SLOT(saveAsFile()));
+    save_file_act_->setEnabled(false);
+    save_file_act_->setShortcut(QKeySequence("Ctrl+S"));
+    file_menu->addAction(save_file_act_);
+
+    save_selected_act_ = new QAction("Save selected as file...", this);
+    connect(save_selected_act_, SIGNAL(triggered()), this, SLOT(saveSelectedAsFile()));
+    save_selected_act_->setEnabled(false);
+    file_menu->addAction(save_selected_act_);
 
     QMenu* input_menu = new QMenu("Input");
     menu->addMenu(input_menu);

@@ -14,6 +14,8 @@ private slots:
     void frameDecoded();
     void selectionChanged();
     void setInputDevice(int index);
+    void saveAsFile(bool selected = false);
+    void saveSelectedAsFile();
 
 private:
     void initializeSettings();
@@ -30,6 +32,8 @@ private:
     SocketServer* server_;
     FrameLogger* logger_;
     QActionGroup* input_action_group_;
+    QAction* save_file_act_;
+    QAction* save_selected_act_;
     QSettings settings_;
 
 };

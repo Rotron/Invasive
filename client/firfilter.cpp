@@ -1,7 +1,5 @@
 #include "FIRFilter.h"
 
-static const double PHI = M_PI;
-
 FIRFilter::FIRFilter(Type type, double sampling, double width, double edge1, double edge2)
 {
   int tap_count = std::round(3.1 / (width / sampling));
@@ -15,17 +13,17 @@ FIRFilter::FIRFilter(Type type, double sampling, double width, double edge1, dou
     int m = static_cast<int>(i - weights_.size() / 2);
     switch (type) {
     case FIR_LOWPASS:
-      weights_[i] = (2.0 * f1 * sinc(2.0 * PHI * f1 * m)) * kaiser_bessel(i);
+      weights_[i] = (2.0 * f1 * sinc(2.0 * M_PI * f1 * m)) * kaiser_bessel(i);
       break;
     case FIR_HIGHPASS:
-      weights_[i] = (sinc(PHI * m) - 2.0 * f1 * sinc(2.0 * PHI * f1 * m)) * kaiser_bessel(i);
+      weights_[i] = (sinc(M_PI * m) - 2.0 * f1 * sinc(2.0 * M_PI * f1 * m)) * kaiser_bessel(i);
       break;
     case FIR_BANDPASS:
-      weights_[i] = 2.0 * (f2 * sinc(2.0 * PHI * f2 * m) - f1 * sinc(2.0 * PHI * f1 * m)) * kaiser_bessel(i);
+      weights_[i] = 2.0 * (f2 * sinc(2.0 * M_PI * f2 * m) - f1 * sinc(2.0 * M_PI * f1 * m)) * kaiser_bessel(i);
       break;
     case FIR_BANDSTOP:
-      weights_[i] = (sinc(PHI * m) - 2.0 * f2 * sinc(2.0 * PHI * f2 * m) +
-                    2.0 * f1 * sinc(2.0 * PHI * f1 * m)) * kaiser_bessel(i);
+      weights_[i] = (sinc(M_PI * m) - 2.0 * f2 * sinc(2.0 * M_PI * f2 * m) +
+                    2.0 * f1 * sinc(2.0 * M_PI * f1 * m)) * kaiser_bessel(i);
       break;
     }
   }

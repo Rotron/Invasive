@@ -110,7 +110,8 @@ void Modem::readSoundData()
         for (int i = 0; i < audio.size() / FFT_SIZE / 2; ++i) {
             QVector<double> signal(FFT_SIZE, 0);
             for (int j = 0; j < FFT_SIZE; ++j) {
-                signal[j] = ((short*)audio.data())[j + FFT_SIZE * i] ;
+                signal[j] = ((short*)audio.data())[j + FFT_SIZE * i]
+                        * 0.5 * (1.0 - cos(2 * M_PI * (j / 1024.0)));
             }
             static int fft_ip[FFT_SIZE / 2] = {0};
             static double fft_w[FFT_SIZE / 2] = {0};

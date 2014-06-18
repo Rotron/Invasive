@@ -16,6 +16,7 @@
 #include <QLineEdit>
 #include <QDir>
 #include <QFileDialog>
+#include <QMessageBox>
 #include <QMetaObject>
 #include <QtEndian>
 #include <QCryptographicHash>

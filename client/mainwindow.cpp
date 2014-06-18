@@ -133,6 +133,14 @@ void MainWindow::saveSelectedAsFile()
     saveAsFile(true);
 }
 
+void MainWindow::openWavFile()
+{
+    QString path = QFileDialog::getOpenFileName(
+                this, "Open wav file", QDir::homePath(), "Wav (*.wav)");
+
+    modem_->decodeWavFile(path);
+}
+
 void MainWindow::closeEvent(QCloseEvent *event)
 {
     settings_.setValue("mainwindow/geometry", saveGeometry());
@@ -169,6 +177,13 @@ void MainWindow::initializeMenuBar()
     connect(save_selected_act_, SIGNAL(triggered()), this, SLOT(saveSelectedAsFile()));
     save_selected_act_->setEnabled(false);
     file_menu->addAction(save_selected_act_);
+
+#ifdef INVASIVE_ENABLE_DECODE_WAV
+    file_menu->addSeparator();
+    QAction *open_wav_act = new QAction(tr("Decode wav file..."), this);
+    connect(open_wav_act, SIGNAL(triggered()), this, SLOT(openWavFile()));
+    file_menu->addAction(open_wav_act);
+#endif
 
     QMenu* input_menu = new QMenu("Input");
     menu->addMenu(input_menu);

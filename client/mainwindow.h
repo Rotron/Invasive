@@ -16,6 +16,7 @@ private slots:
     void setInputDevice(int index);
     void saveAsFile(bool selected = false);
     void saveSelectedAsFile();
+    void openWavFile();
 
 private:
     void initializeSettings();

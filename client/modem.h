@@ -14,6 +14,7 @@ public:
     QAudioFormat audioFormat() const;
     static QList<QString> availableDeviceName();
     bool setAudioDeviceIndex(int index);
+    void decodeWavFile(const QString& path);
 
 private:
     static QList<QAudioDeviceInfo> availableDevices();
@@ -25,6 +26,7 @@ signals:
 
 private slots:
     void readSoundData();
+    void decodeSoundData(const QByteArray& audio);
     void frameDetected(const FrameAudioPtr& frame);
     void decoded(const FramePtr& frame);
 

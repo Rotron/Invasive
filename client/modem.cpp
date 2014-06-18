@@ -74,6 +74,23 @@ bool Modem::setAudioDeviceIndex(int index)
     }
 }
 
+void Modem::decodeWavFile(const QString& path)
+{
+    QFile file(path);
+    if (file.open(QFile::ReadOnly) && file.size() > 42) {
+        file.read(22);
+        int channels = qFromLittleEndian<quint16>(reinterpret_cast<const uchar*>(file.read(2).data()));
+        int rate = qFromLittleEndian<quint32>(reinterpret_cast<const uchar*>(file.read(4).data()));
+        file.read(14);
+        if (channels != 1 || rate != SAMPLING_RATE) {
+            return;
+        }
+        else {
+            decodeSoundData(file.readAll());
+        }
+    }
+}
+
 QList<QString> Modem::availableDeviceName()
 {
     QList<QString> devices;
@@ -102,26 +119,31 @@ void Modem::readSoundData()
 {
     if (audio_device_) {
         QByteArray audio = audio_device_->read(audio_input_->bytesReady());
-        for (const auto& d : detectors_) {
-            QMetaObject::invokeMethod(d.get(), "processAudio", Qt::QueuedConnection, Q_ARG(QByteArray, audio));
-        }
-
-        QVector<float> spectrum(FFT_SIZE, 0);
-        for (int i = 0; i < audio.size() / FFT_SIZE / 2; ++i) {
-            QVector<double> signal(FFT_SIZE, 0);
-            for (int j = 0; j < FFT_SIZE; ++j) {
-                signal[j] = ((short*)audio.data())[j + FFT_SIZE * i]
-                        * 0.5 * (1.0 - cos(2 * M_PI * (j / 1024.0)));
-            }
-            static int fft_ip[FFT_SIZE / 2] = {0};
-            static double fft_w[FFT_SIZE / 2] = {0};
-            rdft(FFT_SIZE, -1, signal.data(), fft_ip, fft_w);
-            for (int j = 0; j < FFT_SIZE; ++j) {
-                spectrum[j] += signal[j] / (audio.size() / FFT_SIZE) / FFT_GAIN;
-            }
-        }
-        emit audioSpectrumUpdated(spectrum.mid(0, FFT_SIZE / 2));
+        decodeSoundData(audio);
     }
+}
+
+void Modem::decodeSoundData(const QByteArray& audio)
+{
+    for (const auto& d : detectors_) {
+        QMetaObject::invokeMethod(d.get(), "processAudio", Qt::QueuedConnection, Q_ARG(QByteArray, audio));
+    }
+
+    QVector<float> spectrum(FFT_SIZE, 0);
+    for (int i = 0; i < audio.size() / FFT_SIZE / 2; ++i) {
+        QVector<double> signal(FFT_SIZE, 0);
+        for (int j = 0; j < FFT_SIZE; ++j) {
+            signal[j] = ((short*)audio.data())[j + FFT_SIZE * i]
+                    * 0.5 * (1.0 - cos(2 * M_PI * (j / 1024.0)));
+        }
+        static int fft_ip[FFT_SIZE / 2] = {0};
+        static double fft_w[FFT_SIZE / 2] = {0};
+        rdft(FFT_SIZE, -1, signal.data(), fft_ip, fft_w);
+        for (int j = 0; j < FFT_SIZE; ++j) {
+            spectrum[j] += signal[j] / (audio.size() / FFT_SIZE) / FFT_GAIN;
+        }
+    }
+    emit audioSpectrumUpdated(spectrum.mid(0, FFT_SIZE / 2));
 }
 
 void Modem::frameDetected(const FrameAudioPtr& frame)

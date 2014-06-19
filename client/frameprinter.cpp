@@ -74,6 +74,7 @@ QString toJson(const FramePtr& frame)
     obj["datetime"] = frame->datetime().toString(Qt::ISODate);
     obj["info-ascii"] = asciiInfo(frame);
     obj["info-hex"] = QString::fromUtf8(frame->info().toHex());
+    obj["broken"] = !frame->validFcs();
 
     QJsonArray addrs;
     for (const Frame::Address& addr : frame->addresses()) {

@@ -8,7 +8,7 @@
 
 namespace {
 
-const int THRESHOLD_RESOLUTION  = 20;
+const int THRESHOLD_RESOLUTION  = 100;
 const int MINIMUM_FARME_BYTES   = 16;
 const int SAMPLING_RATE         = 13200;
 const int BITS_PER_BYTE         = 11;

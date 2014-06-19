@@ -54,7 +54,9 @@ void FrameDetector::processAudio(const QByteArray& data)
 
     const int16_t* ptr = reinterpret_cast<const int16_t*>(data.data());
 
+    auto ST = QDateTime::currentDateTime();
     for (int i = 0; i < samples; ++i) {
+
         double sample = 0.0;
         for (int j = 0; j < channels; ++j) {
             sample += ptr[i * channels + j];
@@ -108,21 +110,26 @@ void FrameDetector::processAudio(const QByteArray& data)
                 }
             }
         }
-
-        if (count % BITS_PER_BYTE == 0) {
+        if (count % (BITS_PER_BYTE) == 0) {
             if (bufflag_.size() == bufflag_.capacity()) {
-                for (int j = 0; j < BITS_PER_BYTE; ++j) {
+                for (int j = 0; j < BITS_PER_BYTE / 2 + 1; ++j) {
                     uint32_t frag_sequence = 0;
+                    const uint32_t frag_sequence_begin = 0x1010101;
+                    const uint32_t frag_sequence_end   = 0xFEFEFE;
                     for (int k = 0; k < FRAME_FLAG_LENGTH; ++k) {
                         double level = 0;
                         for (auto it = bufflag_.begin() + j + k * BITS_PER_BYTE;
                              it != bufflag_.begin() + j + (k + 1) * BITS_PER_BYTE; ++it) {
                             level += *it;
                         }
-                        bool bit = ((level / BITS_PER_BYTE) < 0);
+                        bool bit = (level / BITS_PER_BYTE) < 0;
                         frag_sequence <<= 1;
                         if (bit) {
                             frag_sequence |= 1;
+                        }
+                        if (frag_sequence != (frag_sequence_begin >> (FRAME_FLAG_LENGTH - k - 1)) &&
+                                frag_sequence != (frag_sequence_end >> (FRAME_FLAG_LENGTH - k - 1))) {
+                            break;
                         }
                     }
 

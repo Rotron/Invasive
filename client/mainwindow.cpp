@@ -178,12 +178,12 @@ void MainWindow::initializeMenuBar()
     save_selected_act_->setEnabled(false);
     file_menu->addAction(save_selected_act_);
 
-#ifdef INVASIVE_ENABLE_DECODE_WAV
+//#ifdef INVASIVE_ENABLE_DECODE_WAV
     file_menu->addSeparator();
     QAction *open_wav_act = new QAction(tr("Decode wav file..."), this);
     connect(open_wav_act, SIGNAL(triggered()), this, SLOT(openWavFile()));
     file_menu->addAction(open_wav_act);
-#endif
+//#endif
 
     QMenu* input_menu = new QMenu("Input");
     menu->addMenu(input_menu);

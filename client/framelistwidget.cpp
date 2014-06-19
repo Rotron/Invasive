@@ -256,6 +256,16 @@ void FrameListDelegate::paint(
         painter->drawText(text_rect, QString("[%0 bytes]").arg(frame->info().size()), text_option);
     }
 
+    // length
+    if (!frame->validFcs()) {
+        QRect text_rect = option.rect;
+        text_rect.setTop(text_rect.top() + 2);
+        text_rect.setRight(text_rect.right() - 5);
+        QTextOption text_option(Qt::AlignRight);
+        painter->setPen(QColor("red"));
+        painter->drawText(text_rect, "BROKEN", text_option);
+    }
+
     painter->setOpacity(0.5);
     QStyledItemDelegate::paint(painter, option, index);
     painter->setOpacity(1.0);

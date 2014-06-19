@@ -42,7 +42,8 @@ void Test::testFrame()
         0x67, 0x2d, 0x6d, 0x72, 0x72, 0x20, 0x0d, 0x0a, 0xed, 0x5d
     };
 
-    FramePtr frame = Frame::create(QDateTime::currentDateTime(), QByteArray(reinterpret_cast<const char*>(packet), sizeof(packet)));
+    FramePtr frame = Frame::create(QDateTime::currentDateTime(),
+                                   QByteArray(reinterpret_cast<const char*>(packet), sizeof(packet)), true);
     QVERIFY(static_cast<bool>(frame));
     QCOMPARE(frame->info(), QByteArray("c-p-g-mrr \r\n"));
     QCOMPARE(frame->sha1(), QString("c36dbfb71a691d4e8498a0f1877c7694a5cf7930"));

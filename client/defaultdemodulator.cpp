@@ -8,7 +8,7 @@
 
 namespace {
 
-const int THRESHOLD_RESOLUTION  = 100;
+const int THRESHOLD_RESOLUTION  = 50;
 const int MINIMUM_FARME_BYTES   = 16;
 const int SAMPLING_RATE         = 13200;
 const int BITS_PER_BYTE         = 11;
@@ -71,10 +71,24 @@ FramePtr DefaultDemodulator::exec(const FrameAudio& frame_audio)
 
     for (int i = 0; i <= THRESHOLD_RESOLUTION; ++i) {
         FramePtr frame;
-        process(avg - std::fabs(avg - min / THRESHOLD_WIDTH_RATIO) *
+        process(true, avg - std::fabs(avg - min / THRESHOLD_WIDTH_RATIO) *
+                (1.0 * i / THRESHOLD_RESOLUTION), diff_buff, &frame);
+        if (frame) {
+            return frame;
+        }
+        process(true, avg + std::fabs(avg - max / THRESHOLD_WIDTH_RATIO) *
+                (1.0 * i / THRESHOLD_RESOLUTION), diff_buff, &frame);
+        if (frame) {
+            return frame;
+        }
+    }
+
+    for (int i = 0; i <= THRESHOLD_RESOLUTION; ++i) {
+        FramePtr frame;
+        process(false, avg - std::fabs(avg - min / THRESHOLD_WIDTH_RATIO) *
                 (1.0 * i / THRESHOLD_RESOLUTION), diff_buff, &frame);
         if (frame) return frame;
-        process(avg + std::fabs(avg - max / THRESHOLD_WIDTH_RATIO) *
+        process(false, avg + std::fabs(avg - max / THRESHOLD_WIDTH_RATIO) *
                 (1.0 * i / THRESHOLD_RESOLUTION), diff_buff, &frame);
         if (frame) return frame;
     }
@@ -82,7 +96,7 @@ FramePtr DefaultDemodulator::exec(const FrameAudio& frame_audio)
     return FramePtr();
 }
 
-void DefaultDemodulator::process(double center, const QVector<double>& diff, FramePtr* result)
+void DefaultDemodulator::process(bool verify_fcs, double center, const QVector<double>& diff, FramePtr* result)
 {
     QVector<bool> bit_buffer;
     RingBuffer<double> cb(BITS_PER_BYTE);
@@ -153,7 +167,7 @@ void DefaultDemodulator::process(double center, const QVector<double>& diff, Fra
 
             if (c == '~') {
                 if (frame_data.size() > MINIMUM_FARME_BYTES) {
-                    if (FramePtr frame = Frame::create(frame_audio_->startTime(), frame_data)) {
+                    if (FramePtr frame = Frame::create(frame_audio_->startTime(), frame_data, verify_fcs)) {
                         *result = frame;
                         return;
                     }

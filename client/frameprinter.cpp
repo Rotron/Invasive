@@ -25,9 +25,10 @@ QString toPlainText(const FramePtr& frame)
 {
     QString text;
     text += QString("=").repeated(8) + "\n";
-    text += QString("%0 [%1 bytes]\n")
+    text += QString("%0 [%1 bytes]%2\n")
             .arg(frame->datetime().toString(Qt::ISODate))
-            .arg(frame->info().size());
+            .arg(frame->info().size())
+            .arg(frame->validFcs() ? "" : " BROKEN");
 
     QStringList addresses;
     for (const Frame::Address& addr : frame->addresses()) {
@@ -46,9 +47,10 @@ QString toHtmlText(const FramePtr& frame)
 {
     QString html;
     html += "<font color=\"gray\"><h4>";
-    html += QString("%0 [%1 bytes]")
+    html += QString("%0 [%1 bytes]%2")
             .arg(frame->datetime().toString(Qt::ISODate))
-            .arg(frame->info().size());
+            .arg(frame->info().size())
+            .arg(frame->validFcs() ? "" : " <font color=\"red\">BROKEN</font>");
 
     QStringList addresses;
     for (const Frame::Address& addr : frame->addresses()) {

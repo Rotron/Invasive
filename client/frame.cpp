@@ -44,10 +44,10 @@ Frame::Frame(const QDateTime& datetime) :
 
 }
 
-FramePtr Frame::create(const QDateTime& datetime, const QByteArray& data)
+FramePtr Frame::create(const QDateTime& datetime, const QByteArray& data, bool verify_fcs)
 {
     FramePtr ptr = std::shared_ptr<Frame>(new Frame(datetime));
-    if (ptr->decode(data)) {
+    if (ptr->decode(data) && (!verify_fcs || ptr->validFcs())) {
         return ptr;
     }
     else {
@@ -72,11 +72,11 @@ bool Frame::decode(const QByteArray& data)
     }
     crc ^= 0xffff;
 
-    if (fcs != crc) return false;
+    valid_fcs_ = (fcs == crc);
 
     QByteArray address;
     do {
-        if (data_ptr > data_ptr_end) return false;
+        if (data_ptr >= data_ptr_end) return false;
         address += (*data_ptr) >> 1;
     } while (!(*(data_ptr++) & 1));
 
@@ -88,14 +88,21 @@ bool Frame::decode(const QByteArray& data)
         addr.repeated = pid & 0x40;
         addr.ssid = pid & 0xF;
         addr.callsign = QString::fromUtf8(address.mid(i * 7), 6).trimmed();
+        foreach (QChar c, addr.callsign) {
+            if (!c.isUpper() && !c.isDigit()) {
+                return false;
+            }
+        }
         addresses_ += addr;
     }
+
+    if (data_ptr_end - data_ptr <= 2) return false;
 
     QByteArray control;
     control += *(data_ptr++);
     control += *(data_ptr++);
 
-    for (const uchar* ptr = data_ptr; ptr != fcs_ptr; ++ptr) {
+    for (const uchar* ptr = data_ptr; ptr < fcs_ptr; ++ptr) {
         info_ += (*ptr);
     }
 
@@ -120,4 +127,9 @@ QByteArray Frame::info() const
 QList<Frame::Address> Frame::addresses() const
 {
     return addresses_;
+}
+
+bool Frame::validFcs() const
+{
+    return valid_fcs_;
 }

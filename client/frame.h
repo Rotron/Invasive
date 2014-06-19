@@ -15,11 +15,12 @@ public:
     };
 
 public:
-    static FramePtr create(const QDateTime& datetime, const QByteArray& data);
+    static FramePtr create(const QDateTime& datetime, const QByteArray& data, bool verify_fcs);
     QDateTime datetime() const;
     QString sha1() const;
     QByteArray info() const;
     QList<Address> addresses() const;
+    bool validFcs() const;
 
 private:
     Frame(const QDateTime& datetime);
@@ -32,5 +33,6 @@ private:
     QString sha1_;
     QByteArray info_;
     QList<Address> addresses_;
+    bool valid_fcs_;
 
 };

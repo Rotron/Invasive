@@ -10,6 +10,7 @@ WaterfallView::WaterfallView(QWidget *parent) :
     QGLWidget(QGLFormat(QGL::SampleBuffers), parent),
     count_(0),
     decoded_packets_(0),
+    complete_packets_(0),
     decode_ratio_(0)
 {
     setAutoFillBackground(false);
@@ -28,6 +29,11 @@ void WaterfallView::updateAudioSpectrum(const QVector<float>& data)
 void WaterfallView::setDecodedPackets(int count)
 {
     decoded_packets_ = count;
+}
+
+void WaterfallView::setCompletePackets(int count)
+{
+    complete_packets_ = count;
 }
 
 void WaterfallView::setDecodeRatio(double ratio)
@@ -126,6 +132,12 @@ void WaterfallView::paintEvent(QPaintEvent *event)
     {
         QRect text_rect = rect();
         text_rect.setTop(text_rect.top() + 28);
+        text_rect.setRight(text_rect.right() - 10);
+        painter.drawText(text_rect, Qt::AlignRight, QString("Complete packets: %0").arg(complete_packets_));
+    }
+    {
+        QRect text_rect = rect();
+        text_rect.setTop(text_rect.top() + 48);
         text_rect.setRight(text_rect.right() - 10);
         painter.drawText(text_rect, Qt::AlignRight,
                          QString("Decode ratio: %0%").arg(QString::number(decode_ratio_ * 100 ,'f', 2)));

@@ -86,6 +86,11 @@ MainWindow::~MainWindow()
 
 void MainWindow::frameDecoded()
 {
+    int count = 0;
+    foreach (const FramePtr& frame, frame_list_->getAllFrames()) {
+        if (frame->validFcs()) count++;
+    }
+    waterfall_->setCompletePackets(count);
     waterfall_->setDecodedPackets(frame_list_->count());
     save_file_act_->setEnabled(frame_list_->count() > 0);
 }
@@ -178,12 +183,10 @@ void MainWindow::initializeMenuBar()
     save_selected_act_->setEnabled(false);
     file_menu->addAction(save_selected_act_);
 
-//#ifdef INVASIVE_ENABLE_DECODE_WAV
     file_menu->addSeparator();
     QAction *open_wav_act = new QAction(tr("Decode wav file..."), this);
     connect(open_wav_act, SIGNAL(triggered()), this, SLOT(openWavFile()));
     file_menu->addAction(open_wav_act);
-//#endif
 
     QMenu* input_menu = new QMenu("Input");
     menu->addMenu(input_menu);

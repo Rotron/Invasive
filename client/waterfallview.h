@@ -19,6 +19,7 @@ private:
 public slots:
     void updateAudioSpectrum(const QVector<float>& data);
     void setDecodedPackets(int count);
+    void setCompletePackets(int count);
     void setDecodeRatio(double ratio);
 
 private slots:
@@ -34,5 +35,6 @@ private:
     QVector<float> line_buffer_;
 
     int decoded_packets_;
+    int complete_packets_;
     double decode_ratio_;
 };

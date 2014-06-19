@@ -41,6 +41,6 @@ private:
 
     QMap<QString, QDateTime> last_frame_map_;
     int detected_count_;
-    int Decoded_count_;
+    int decoded_count_;
 
 };

@@ -122,7 +122,7 @@ void FrameDetector::processAudio(const QByteArray& data)
                              it != bufflag_.begin() + j + (k + 1) * BITS_PER_BYTE; ++it) {
                             level += *it;
                         }
-                        bool bit = (level / BITS_PER_BYTE) < 0;
+                        bool bit = level  < 0;
                         frag_sequence <<= 1;
                         if (bit) {
                             frag_sequence |= 1;

@@ -2,6 +2,7 @@
 #include <QCryptographicHash>
 #include <QStringList>
 #include <QtEndian>
+#include <QDebug>
 
 static const uint16_t crc16_table[] = {
     0x0000, 0x1189, 0x2312, 0x329b, 0x4624, 0x57ad, 0x6536, 0x74bf,

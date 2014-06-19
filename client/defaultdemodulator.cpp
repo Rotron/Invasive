@@ -53,8 +53,6 @@ FramePtr DefaultDemodulator::exec(const FrameAudio& frame_audio)
 
     QVector<double> diff_buff;
 
-    double max = -FLT_MAX;
-    double min = FLT_MAX;
     for (int i = 0; i < buffer.size(); ++i) {
       bufs1200.push_back(sin(M_PI * 2 / SAMPLING_RATE * 1200.0 * i) * buffer[i]);
       bufc1200.push_back(cos(M_PI * 2 / SAMPLING_RATE * 1200.0 * i) * buffer[i]);
@@ -63,20 +61,22 @@ FramePtr DefaultDemodulator::exec(const FrameAudio& frame_audio)
       double low = std::hypotf(bufs1200.sum(), bufc1200.sum());
       double high = std::hypotf(bufs2200.sum() , bufc2200.sum());
       diff_buff.push_back(low - high);
-      max = std::max(max, low - high);
-      min = std::min(min, low - high);
     }
 
-    double avg = (max + min) / 2.0;
+    QVector<double> diff_buff_center = diff_buff;
+    qSort(diff_buff_center);
+    double min = diff_buff_center[diff_buff_center.size() / 4];
+    double max = diff_buff_center[diff_buff_center.size() / 4 + diff_buff_center.size() / 2];
+    double center = diff_buff_center[diff_buff_center.size() / 2];
 
     for (int i = 0; i <= THRESHOLD_RESOLUTION; ++i) {
         FramePtr frame;
-        process(true, avg - std::fabs(avg - min / THRESHOLD_WIDTH_RATIO) *
+        process(true, center - std::fabs(center - min / THRESHOLD_WIDTH_RATIO) *
                 (1.0 * i / THRESHOLD_RESOLUTION), diff_buff, &frame);
         if (frame) {
             return frame;
         }
-        process(true, avg + std::fabs(avg - max / THRESHOLD_WIDTH_RATIO) *
+        process(true, center + std::fabs(center - max / THRESHOLD_WIDTH_RATIO) *
                 (1.0 * i / THRESHOLD_RESOLUTION), diff_buff, &frame);
         if (frame) {
             return frame;
@@ -85,10 +85,10 @@ FramePtr DefaultDemodulator::exec(const FrameAudio& frame_audio)
 
     for (int i = 0; i <= THRESHOLD_RESOLUTION; ++i) {
         FramePtr frame;
-        process(false, avg - std::fabs(avg - min / THRESHOLD_WIDTH_RATIO) *
+        process(false, center - std::fabs(center - min / THRESHOLD_WIDTH_RATIO) *
                 (1.0 * i / THRESHOLD_RESOLUTION), diff_buff, &frame);
         if (frame) return frame;
-        process(false, avg + std::fabs(avg - max / THRESHOLD_WIDTH_RATIO) *
+        process(false, center + std::fabs(center - max / THRESHOLD_WIDTH_RATIO) *
                 (1.0 * i / THRESHOLD_RESOLUTION), diff_buff, &frame);
         if (frame) return frame;
     }

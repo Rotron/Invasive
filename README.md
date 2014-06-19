@@ -20,6 +20,10 @@ JSON-encoded frame data is available on TCP port 19780 (by default)
 
 Write a frame log file to the home directory (by default)
 
+### Broken frame
+
+Show probable frames that have wrong FCS
+
 ## Build Requirements
 
 ### Mac OS X

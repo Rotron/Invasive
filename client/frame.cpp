@@ -98,6 +98,7 @@ bool Frame::decode(const QByteArray& data)
         addresses_ += addr;
     }
 
+    if (addresses_.size() < 2) return false;
     if (data_ptr_end - data_ptr <= 2) return false;
 
     QByteArray control;

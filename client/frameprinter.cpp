@@ -28,7 +28,7 @@ QString toPlainText(const FramePtr& frame)
     text += QString("%0 [%1 bytes]%2\n")
             .arg(frame->datetime().toString(Qt::ISODate))
             .arg(frame->info().size())
-            .arg(frame->validFcs() ? "" : " BROKEN");
+            .arg(frame->isValid() ? "" : " Broken");
 
     QStringList addresses;
     for (const Frame::Address& addr : frame->addresses()) {
@@ -50,7 +50,7 @@ QString toHtmlText(const FramePtr& frame)
     html += QString("%0 [%1 bytes]%2")
             .arg(frame->datetime().toString(Qt::ISODate))
             .arg(frame->info().size())
-            .arg(frame->validFcs() ? "" : " <font color=\"red\">BROKEN</font>");
+            .arg(frame->isValid() ? "" : " <font color=\"red\">Broken</font>");
 
     QStringList addresses;
     for (const Frame::Address& addr : frame->addresses()) {
@@ -74,7 +74,7 @@ QString toJson(const FramePtr& frame)
     obj["datetime"] = frame->datetime().toString(Qt::ISODate);
     obj["info-ascii"] = asciiInfo(frame);
     obj["info-hex"] = QString::fromUtf8(frame->info().toHex());
-    obj["broken"] = !frame->validFcs();
+    obj["broken"] = !frame->isValid();
 
     QJsonArray addrs;
     for (const Frame::Address& addr : frame->addresses()) {

@@ -257,13 +257,13 @@ void FrameListDelegate::paint(
     }
 
     // length
-    if (!frame->validFcs()) {
+    if (!frame->isValid()) {
         QRect text_rect = option.rect;
         text_rect.setTop(text_rect.top() + 2);
         text_rect.setRight(text_rect.right() - 5);
         QTextOption text_option(Qt::AlignRight);
         painter->setPen(QColor("red"));
-        painter->drawText(text_rect, "BROKEN", text_option);
+        painter->drawText(text_rect, "Broken", text_option);
     }
 
     painter->setOpacity(0.5);

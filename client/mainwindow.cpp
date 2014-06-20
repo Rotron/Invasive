@@ -88,7 +88,7 @@ void MainWindow::frameDecoded()
 {
     int count = 0;
     foreach (const FramePtr& frame, frame_list_->getAllFrames()) {
-        if (frame->validFcs()) count++;
+        if (frame->isValid()) count++;
     }
     waterfall_->setCompletePackets(count);
     waterfall_->setDecodedPackets(frame_list_->count());

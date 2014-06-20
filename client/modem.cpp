@@ -181,6 +181,6 @@ void Modem::decoded(const FramePtr& frame)
         last_frame_map_[frame->sha1()] = frame->datetime();
         emit frameDecoded(frame);
     }
-    if (frame->validFcs()) decoded_count_++;
+    if (frame->isValid()) decoded_count_++;
     emit decodeRatioUpdated(1.0 * decoded_count_ / detected_count_);
 }

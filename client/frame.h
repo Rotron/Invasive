@@ -20,7 +20,9 @@ public:
     QString sha1() const;
     QByteArray info() const;
     QList<Address> addresses() const;
-    bool validFcs() const;
+    QByteArray data() const;
+    uint16_t fcs() const;
+    bool isValid() const;
 
 private:
     Frame(const QDateTime& datetime);
@@ -33,6 +35,8 @@ private:
     QString sha1_;
     QByteArray info_;
     QList<Address> addresses_;
+    QByteArray data_;
+    uint16_t fcs_;
     bool valid_fcs_;
 
 };

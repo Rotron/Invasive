@@ -48,7 +48,7 @@ Frame::Frame(const QDateTime& datetime) :
 FramePtr Frame::create(const QDateTime& datetime, const QByteArray& data, bool verify_fcs)
 {
     FramePtr ptr = std::shared_ptr<Frame>(new Frame(datetime));
-    if (ptr->decode(data) && (!verify_fcs || ptr->validFcs())) {
+    if (ptr->decode(data) && (!verify_fcs || ptr->isValid())) {
         return ptr;
     }
     else {
@@ -59,13 +59,14 @@ FramePtr Frame::create(const QDateTime& datetime, const QByteArray& data, bool v
 bool Frame::decode(const QByteArray& data)
 {
     if (data.size() < 17) return false;
+    data_ = data;
 
     sha1_ = QCryptographicHash::hash(data,QCryptographicHash::Sha1).toHex();
 
     const uchar* data_ptr = reinterpret_cast<const uchar*>(data.data());
     const uchar* data_ptr_end = data_ptr + data.size();
     const uchar* fcs_ptr = data_ptr_end - sizeof(uint16_t);
-    uint16_t fcs = qFromLittleEndian<uint16_t>(fcs_ptr);
+    fcs_ = qFromLittleEndian<uint16_t>(fcs_ptr);
 
     uint16_t crc = 0xffff;
     for (size_t i = 0; i < data.size() - sizeof(uint16_t); ++i) {
@@ -73,7 +74,7 @@ bool Frame::decode(const QByteArray& data)
     }
     crc ^= 0xffff;
 
-    valid_fcs_ = (fcs == crc);
+    valid_fcs_ = (fcs_ == crc);
 
     QByteArray address;
     do {
@@ -130,7 +131,17 @@ QList<Frame::Address> Frame::addresses() const
     return addresses_;
 }
 
-bool Frame::validFcs() const
+QByteArray Frame::data() const
+{
+    return data_;
+}
+
+uint16_t Frame::fcs() const
+{
+    return fcs_;
+}
+
+bool Frame::isValid() const
 {
     return valid_fcs_;
 }

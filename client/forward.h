@@ -9,7 +9,7 @@ class SocketServer;
 class WaterfallView;
 class FrameLogger;
 
-class AbstractDemodulator;
+class DemodulatorInterface;
 class DemodulatorFactoryInterface;
 typedef std::shared_ptr<DemodulatorFactoryInterface> DemodulatorFactoryPtr;
 

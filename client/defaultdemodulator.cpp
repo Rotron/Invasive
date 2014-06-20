@@ -16,13 +16,13 @@ const double THRESHOLD_WIDTH_RATIO = 2.0;
 
 }
 
-DefaultDemodulator::DefaultDemodulator(const FrameAudioPtr& frame_audio) :
-    AbstractDemodulator(frame_audio)
+DefaultDemodulator::DefaultDemodulator(bool verify_fcs) :
+    verify_fcs_(verify_fcs)
 {
 
 }
 
-FramePtr DefaultDemodulator::exec(const FrameAudio& frame_audio)
+FramePtr DefaultDemodulator::decode(const FrameAudio& frame_audio)
 {
     QVector<double> buffer;
     buffer.reserve(frame_audio.count());
@@ -71,26 +71,16 @@ FramePtr DefaultDemodulator::exec(const FrameAudio& frame_audio)
 
     for (int i = 0; i <= THRESHOLD_RESOLUTION; ++i) {
         FramePtr frame;
-        process(true, center - std::fabs(center - min / THRESHOLD_WIDTH_RATIO) *
+        process(verify_fcs_, center - std::fabs(center - min / THRESHOLD_WIDTH_RATIO) *
                 (1.0 * i / THRESHOLD_RESOLUTION), diff_buff, &frame);
         if (frame) {
             return frame;
         }
-        process(true, center + std::fabs(center - max / THRESHOLD_WIDTH_RATIO) *
+        process(verify_fcs_, center + std::fabs(center - max / THRESHOLD_WIDTH_RATIO) *
                 (1.0 * i / THRESHOLD_RESOLUTION), diff_buff, &frame);
         if (frame) {
             return frame;
         }
-    }
-
-    for (int i = 0; i <= THRESHOLD_RESOLUTION; ++i) {
-        FramePtr frame;
-        process(false, center - std::fabs(center - min / THRESHOLD_WIDTH_RATIO) *
-                (1.0 * i / THRESHOLD_RESOLUTION), diff_buff, &frame);
-        if (frame) return frame;
-        process(false, center + std::fabs(center - max / THRESHOLD_WIDTH_RATIO) *
-                (1.0 * i / THRESHOLD_RESOLUTION), diff_buff, &frame);
-        if (frame) return frame;
     }
 
     return FramePtr();
@@ -167,13 +157,12 @@ void DefaultDemodulator::process(bool verify_fcs, double center, const QVector<d
 
             if (c == '~') {
                 if (frame_data.size() > MINIMUM_FARME_BYTES) {
-                    if (FramePtr frame = Frame::create(frame_audio_->startTime(), frame_data, verify_fcs)) {
-                        *result = frame;
-                        return;
+                    if (FramePtr frame = Frame::create(QDateTime::currentDateTime(), frame_data)) {
+                        if (!verify_fcs || frame->isValid()) {
+                            *result = frame;
+                        }
                     }
-                    else {
-                        return;
-                    }
+                    return;
                 }
             }
             else {
@@ -192,8 +181,14 @@ void DefaultDemodulator::process(bool verify_fcs, double center, const QVector<d
     return;
 }
 
-AbstractDemodulator* DefaultDemodulatorFactory::make(const FrameAudioPtr& frame_audio) const
+DefaultDemodulatorFactory::DefaultDemodulatorFactory(bool verify_fcs) :
+    verify_fcs_(verify_fcs)
 {
-    return new DefaultDemodulator(frame_audio);
+
+}
+
+DemodulatorInterface* DefaultDemodulatorFactory::make() const
+{
+    return new DefaultDemodulator(verify_fcs_);
 }
 

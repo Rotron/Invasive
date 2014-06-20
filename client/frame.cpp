@@ -45,10 +45,10 @@ Frame::Frame(const QDateTime& datetime) :
 
 }
 
-FramePtr Frame::create(const QDateTime& datetime, const QByteArray& data, bool verify_fcs)
+FramePtr Frame::create(const QDateTime& datetime, const QByteArray& data)
 {
     FramePtr ptr = std::shared_ptr<Frame>(new Frame(datetime));
-    if (ptr->decode(data) && (!verify_fcs || ptr->isValid())) {
+    if (ptr->decode(data)) {
         return ptr;
     }
     else {
@@ -74,7 +74,7 @@ bool Frame::decode(const QByteArray& data)
     }
     crc ^= 0xffff;
 
-    valid_fcs_ = (fcs_ == crc);
+    actual_fcs_ = crc;
 
     QByteArray address;
     do {
@@ -142,7 +142,12 @@ uint16_t Frame::fcs() const
     return fcs_;
 }
 
+uint16_t Frame::actualFcs() const
+{
+    return actual_fcs_;
+}
+
 bool Frame::isValid() const
 {
-    return valid_fcs_;
+    return fcs_ == actual_fcs_;
 }

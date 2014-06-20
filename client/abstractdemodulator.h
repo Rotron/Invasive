@@ -2,27 +2,15 @@
 #include "forward.h"
 #include "stdafx.h"
 
-class AbstractDemodulator : public QObject, public QRunnable
+class DemodulatorInterface
 {
-    Q_OBJECT
 public:
-    AbstractDemodulator(const FrameAudioPtr& frame_audio, QObject *parent = 0);
-    virtual ~AbstractDemodulator();
-    void run();
-
-signals:
-    void Decoded(FramePtr);
-
-protected:
-    virtual FramePtr exec(const FrameAudio& frame_audio) = 0;
-
-protected:
-    FrameAudioPtr frame_audio_;
+    virtual FramePtr decode(const FrameAudio& frame_audio) = 0;
 
 };
 
 class DemodulatorFactoryInterface
 {
 public:
-    virtual AbstractDemodulator* make(const FrameAudioPtr& frame_audio) const = 0;
+    virtual DemodulatorInterface* make() const = 0;
 };

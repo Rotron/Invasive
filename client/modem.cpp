@@ -1,6 +1,7 @@
 #include "modem.h"
 #include "abstractframedetector.h"
 #include "abstractdemodulator.h"
+#include "demodulatorset.h"
 #include "frameaudio.h"
 #include "frame.h"
 
@@ -148,12 +149,9 @@ void Modem::decodeSoundData(const QByteArray& audio)
 
 void Modem::frameDetected(const FrameAudioPtr& frame)
 {
-    for (const auto& f : factories_) {
-        if (AbstractDemodulator *demodulator = f->make(std::make_shared<FrameAudio>(*frame))) {
-            connect(demodulator, SIGNAL(Decoded(FramePtr)), this, SLOT(decoded(FramePtr)));
-            thread_pool_.start(demodulator);
-        }
-    }
+    DemodulatorSet *set = new DemodulatorSet(factories_, frame);
+    connect(set, SIGNAL(decoded(FramePtr)), this, SLOT(decoded(FramePtr)));
+    thread_pool_.start(set);
     detected_count_++;
     emit decodeRatioUpdated(1.0 * decoded_count_ / detected_count_);
 }
@@ -176,11 +174,9 @@ void Modem::addDemodulatorFacory(const DemodulatorFactoryPtr& factory)
 
 void Modem::decoded(const FramePtr& frame)
 {
-    QDateTime last_Decoded = last_frame_map_[frame->sha1()];
-    if (last_Decoded.isNull() || last_Decoded.secsTo(frame->datetime()) > 5) {
-        last_frame_map_[frame->sha1()] = frame->datetime();
+    if (frame) {
+        if (frame->isValid()) decoded_count_++;
+        emit decodeRatioUpdated(1.0 * decoded_count_ / detected_count_);
         emit frameDecoded(frame);
     }
-    if (frame->isValid()) decoded_count_++;
-    emit decodeRatioUpdated(1.0 * decoded_count_ / detected_count_);
 }

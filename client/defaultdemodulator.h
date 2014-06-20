@@ -2,23 +2,27 @@
 #include "stdafx.h"
 #include "abstractdemodulator.h"
 
-class DefaultDemodulator : public AbstractDemodulator
+class DefaultDemodulator : public DemodulatorInterface
 {
-    Q_OBJECT
 public:
-    explicit DefaultDemodulator(const FrameAudioPtr& frame_audio);
-
-protected:
-    FramePtr exec(const FrameAudio& frame_audio);
+    explicit DefaultDemodulator(bool verify_fcs = true);
+    FramePtr decode(const FrameAudio& frame_audio);
 
 private:
     void process(bool verify_fcs, double center, const QVector<double>& diff, FramePtr* result);
+
+private:
+    bool verify_fcs_;
 
 };
 
 class DefaultDemodulatorFactory : public DemodulatorFactoryInterface
 {
 public:
-    AbstractDemodulator* make(const FrameAudioPtr& frame_audio) const;
+    DefaultDemodulatorFactory(bool verify_fcs = true);
+    DemodulatorInterface* make() const;
+
+private:
+    bool verify_fcs_;
 
 };

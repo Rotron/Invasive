@@ -39,7 +39,6 @@ private:
     QThreadPool thread_pool_;
     QThread detector_thread_;
 
-    QMap<QString, QDateTime> last_frame_map_;
     int detected_count_;
     int decoded_count_;
 

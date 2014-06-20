@@ -64,6 +64,7 @@ MainWindow::MainWindow(QWidget *parent) :
     splitter->setStretchFactor(1, 3);
 
     modem_ = new Modem(this);
+
     connect(modem_, SIGNAL(frameDecoded(FramePtr)), frame_list_, SLOT(addFrame(FramePtr)));
     connect(modem_, SIGNAL(frameDecoded(FramePtr)), server_, SLOT(writeFrame(FramePtr)));
     connect(modem_, SIGNAL(frameDecoded(FramePtr)), this, SLOT(frameDecoded()));
@@ -77,6 +78,10 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(modem_, SIGNAL(frameDecoded(FramePtr)), logger_, SLOT(writeFrame(FramePtr)));
 
     initializeMenuBar();
+
+    modem_->addFrameDetector(std::make_shared<FrameDetector>(modem_->audioFormat()));
+    modem_->addDemodulatorFacory(std::make_shared<DefaultDemodulatorFactory>(true));
+    modem_->addDemodulatorFacory(std::make_shared<DefaultDemodulatorFactory>(false));
 }
 
 MainWindow::~MainWindow()
@@ -222,6 +227,4 @@ void MainWindow::initializeMenuBar()
     help_menu->addAction(about_qt_act);
 
     setInputDevice(settings_.value("input_device", 0).toUInt());
-    modem_->addDemodulatorFacory(std::make_shared<DefaultDemodulatorFactory>());
-    modem_->addFrameDetector(std::make_shared<FrameDetector>(modem_->audioFormat()));
 }

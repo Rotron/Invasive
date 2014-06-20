@@ -22,7 +22,7 @@ SOURCES += \
     configdialog.cpp \
     socketserver.cpp \
     waterfallview.cpp \
-    ../vendor/fft/fftsg.c \
+    ../vendor/fft/fft8g.c \
     framelogger.cpp
 
 HEADERS  += \

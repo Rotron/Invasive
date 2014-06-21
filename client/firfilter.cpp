@@ -62,7 +62,7 @@ size_t FIRFilter::size()
 
 double FIRFilter::kaiser_bessel(int x)
 {
-  double alpha = M_PI * 100;
+  double alpha = M_PI * 220;
   int np = static_cast<int>(weights_.size() - 1) / 2;
   return bessel(alpha * std::sqrt(1 - std::pow(static_cast<double>(x - np) / np, 2))) / bessel(alpha);
 }

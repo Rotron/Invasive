@@ -50,75 +50,84 @@ void WaterfallView::paintEvent(QPaintEvent *event)
 {
     count_++;
 
-    makeCurrent();
-    glLoadIdentity();
-    glViewport(0, 0, rect().width(), rect().height());
+    bool opengl30 = true;
+#if defined(Q_OS_WIN32) || defined(Q_OS_LINUX)
+    opengl30 = GLEW_ARB_framebuffer_object;
+#endif
 
-    glBindTexture(GL_TEXTURE_1D, line_texture_);
-
-    if (line_buffer_.size() > 0) {
-        glTexImage1D(GL_TEXTURE_1D, 0, GL_RGB, line_buffer_.size(),
-                     0, GL_RED, GL_FLOAT, line_buffer_.data());
-    }
-    else {
-        unsigned char buf[1] = {0};
-        glTexImage1D(GL_TEXTURE_1D, 0, GL_RGB, 1,
-                     0, GL_RED, GL_UNSIGNED_BYTE, buf);
-    }
-
-    glBindFramebuffer(GL_FRAMEBUFFER, framebuffers_[count_ % 2]);
     glClear(GL_COLOR_BUFFER_BIT);
 
-    glViewport(0, 0, 1024, 1024);
-    glEnable(GL_TEXTURE_1D);
-    glBegin(GL_QUADS);
-    glTexCoord1d(0.0);
-    glVertex2d(-1.0, -1.0);
-    glTexCoord1d(1.0);
-    glVertex2d(1.0, -1.0);
-    glTexCoord1d(1.0);
-    glVertex2d(1.0,  1.0);
-    glTexCoord1d(0.0);
-    glVertex2d(-1.0,  1.0);
-    glEnd();
-    glDisable(GL_TEXTURE_1D);
-    glBindTexture(GL_TEXTURE_1D, 0);
+    if (opengl30) {
+        makeCurrent();
+        glLoadIdentity();
+        glViewport(0, 0, rect().width(), rect().height());
 
-    glBindTexture(GL_TEXTURE_2D, textures_[1 - count_ % 2]);
-    glEnable(GL_TEXTURE_2D);
-    glBegin(GL_QUADS);
+        glBindTexture(GL_TEXTURE_1D, line_texture_);
 
-    glTexCoord2d(0.0, 0.0);
-    glVertex2d(-1.0, -1.0 + 0.01);
-    glTexCoord2d(1.0, 0.0);
-    glVertex2d(1.0, -1.0 + 0.01);
-    glTexCoord2d(1.0, 1.0);
-    glVertex2d(1.0,  1.0 + 0.01);
-    glTexCoord2d(0.0, 1.0);
-    glVertex2d(-1.0,  1.0 + 0.01);
+        if (line_buffer_.size() > 0) {
+            glTexImage1D(GL_TEXTURE_1D, 0, GL_RGB, line_buffer_.size(),
+                         0, GL_RED, GL_FLOAT, line_buffer_.data());
+        }
+        else {
+            unsigned char buf[1] = {0};
+            glTexImage1D(GL_TEXTURE_1D, 0, GL_RGB, 1,
+                         0, GL_RED, GL_UNSIGNED_BYTE, buf);
+        }
 
-    glEnd();
-    glDisable(GL_TEXTURE_2D);
+        glBindFramebuffer(GL_FRAMEBUFFER, framebuffers_[count_ % 2]);
+        glClear(GL_COLOR_BUFFER_BIT);
 
-    glUseProgram(program_);
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    glViewport(0, 0, rect().width(), rect().height());
-    glClear(GL_COLOR_BUFFER_BIT);
+        glViewport(0, 0, 1024, 1024);
+        glEnable(GL_TEXTURE_1D);
+        glBegin(GL_QUADS);
+        glTexCoord1d(0.0);
+        glVertex2d(-1.0, -1.0);
+        glTexCoord1d(1.0);
+        glVertex2d(1.0, -1.0);
+        glTexCoord1d(1.0);
+        glVertex2d(1.0,  1.0);
+        glTexCoord1d(0.0);
+        glVertex2d(-1.0,  1.0);
+        glEnd();
+        glDisable(GL_TEXTURE_1D);
+        glBindTexture(GL_TEXTURE_1D, 0);
 
-    glBindTexture(GL_TEXTURE_2D, textures_[count_ % 2]);
-    glEnable(GL_TEXTURE_2D);
-    glBegin(GL_QUADS);
-    glTexCoord2d(0.0, 1.0);
-    glVertex2d(-1.0, -1.0);
-    glTexCoord2d(1.0, 1.0);
-    glVertex2d(1.0, -1.0);
-    glTexCoord2d(1.0, 0.0);
-    glVertex2d(1.0,  1.0);
-    glTexCoord2d(0.0, 0.0);
-    glVertex2d(-1.0,  1.0);
-    glEnd();
-    glDisable(GL_TEXTURE_2D);
-    glUseProgram(0);
+        glBindTexture(GL_TEXTURE_2D, textures_[1 - count_ % 2]);
+        glEnable(GL_TEXTURE_2D);
+        glBegin(GL_QUADS);
+
+        glTexCoord2d(0.0, 0.0);
+        glVertex2d(-1.0, -1.0 + 0.01);
+        glTexCoord2d(1.0, 0.0);
+        glVertex2d(1.0, -1.0 + 0.01);
+        glTexCoord2d(1.0, 1.0);
+        glVertex2d(1.0,  1.0 + 0.01);
+        glTexCoord2d(0.0, 1.0);
+        glVertex2d(-1.0,  1.0 + 0.01);
+
+        glEnd();
+        glDisable(GL_TEXTURE_2D);
+
+        glUseProgram(program_);
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        glViewport(0, 0, rect().width(), rect().height());
+        glClear(GL_COLOR_BUFFER_BIT);
+
+        glBindTexture(GL_TEXTURE_2D, textures_[count_ % 2]);
+        glEnable(GL_TEXTURE_2D);
+        glBegin(GL_QUADS);
+        glTexCoord2d(0.0, 1.0);
+        glVertex2d(-1.0, -1.0);
+        glTexCoord2d(1.0, 1.0);
+        glVertex2d(1.0, -1.0);
+        glTexCoord2d(1.0, 0.0);
+        glVertex2d(1.0,  1.0);
+        glTexCoord2d(0.0, 0.0);
+        glVertex2d(-1.0,  1.0);
+        glEnd();
+        glDisable(GL_TEXTURE_2D);
+        glUseProgram(0);
+    }
 
     QPainter painter(this);
     painter.setRenderHint(QPainter::Antialiasing);
@@ -148,8 +157,10 @@ void WaterfallView::paintEvent(QPaintEvent *event)
 void WaterfallView::initializeGL()
 {
     QGLWidget::initializeGL();
+
 #if defined(Q_OS_WIN32) || defined(Q_OS_LINUX)
     glewInit();
+    if (!GLEW_ARB_framebuffer_object) return;
 #endif
 
     makeCurrent();

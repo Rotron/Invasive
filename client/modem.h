@@ -2,6 +2,10 @@
 #include "stdafx.h"
 #include "forward.h"
 
+#if defined(Q_OS_LINUX)
+#include "pulseaudio.h"
+#endif
+
 class Modem : public QObject
 {
     Q_OBJECT
@@ -41,5 +45,9 @@ private:
 
     int detected_count_;
     int decoded_count_;
+
+#if defined(Q_OS_LINUX)
+    QScopedPointer<PulseAudio> pulse_audio_;
+#endif
 
 };

@@ -46,8 +46,11 @@ HEADERS  += \
     framelogger.h \
     demodulatorset.h
 
+linux:SOURCES += pulseaudio.cpp
+linux:HEADERS += pulseaudio.h
+
 win32:LIBS += -lglew32
-linux:LIBS += -lGLEW
+linux:LIBS += -lGLEW -lpulse -lpulse-simple
 
 PRECOMPILED_HEADER = stdafx.h
 precompile_header:!isEmpty(PRECOMPILED_HEADER) {

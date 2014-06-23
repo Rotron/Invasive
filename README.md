@@ -36,6 +36,13 @@ Show probable frames that have wrong FCS
 * Visual Studio 2013
 * Qt 5.3
 * GLEW 1.10.0
+ 
+### Linux
+* gcc 4.8.2
+* Qt 5.3
+* GLEW 1.10.0
+* PulseAudio
+
 
 ## License
 

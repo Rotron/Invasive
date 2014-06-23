@@ -113,9 +113,10 @@ void MainWindow::selectionChanged()
 
 void MainWindow::setInputDevice(int index)
 {
-    input_action_group_->actions().at(index)->setChecked(true);
-    modem_->setAudioDeviceIndex(index);
-    settings_.setValue("input_device", index);
+    if (modem_->setAudioDeviceIndex(index)) {
+        input_action_group_->actions().at(index)->setChecked(true);
+        settings_.setValue("input_device", index);
+    }
 }
 
 void MainWindow::saveAsFile(bool selected)

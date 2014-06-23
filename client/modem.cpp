@@ -37,7 +37,12 @@ Modem::~Modem()
 
 QAudioFormat Modem::audioFormat() const
 {
-    return audio_input_->format();
+    if (audio_input_) {
+        return audio_input_->format();
+    }
+    else {
+        return QAudioFormat();
+    }
 }
 
 bool Modem::setAudioDeviceIndex(int index)

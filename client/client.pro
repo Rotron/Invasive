@@ -44,7 +44,8 @@ HEADERS  += \
     socketserver.h \
     waterfallview.h \
     framelogger.h \
-    demodulatorset.h
+    demodulatorset.h \
+    window.h
 
 win32:LIBS += -lglew32
 linux:LIBS += -lGLEW

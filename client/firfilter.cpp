@@ -1,6 +1,6 @@
 #include "firfilter.h"
 
-FIRFilter::FIRFilter(Type type, double sampling, double width, double edge1, double edge2, const std::function<double(int,int)>& func)
+FIRFilter::FIRFilter(Type type, const std::function<double(int,int)>& func, double sampling, double width, double edge1, double edge2)
 {
   int tap_count = std::round(3.1 / (width / sampling));
   if (tap_count % 2 == 0) tap_count++;
@@ -58,38 +58,4 @@ double FIRFilter::sinc(double x)
 size_t FIRFilter::size()
 {
   return weights_.size();
-}
-
-double FIRFilter::flattop(int n, int x)
-{
-    double np = x / (n - 1);
-    return 1-1.93 * cos(2*M_PI*np) + 1.29 * cos(4*M_PI*np) - 0.388 * cos(6*M_PI*np) + 0.032*cos(8*M_PI*np);
-}
-
-double FIRFilter::kaiser_bessel(int n, int x)
-{
-  double alpha = M_PI * 220;
-  int np = static_cast<int>(n - 1) / 2;
-  return bessel(alpha * std::sqrt(1 - std::pow(static_cast<double>(x - np) / np, 2))) / bessel(alpha);
-}
-
-double FIRFilter::kaiser_bessel2(int n, int x)
-{
-  double alpha = M_PI * 100;
-  int np = static_cast<int>(n - 1) / 2;
-  return bessel(alpha * std::sqrt(1 - std::pow(static_cast<double>(x - np) / np, 2))) / bessel(alpha);
-}
-
-double FIRFilter::bessel(double x)
-{
-  double d = 0.0;
-  double ds = 1.0;
-  double s = 1.0;
-  do {
-    d += 2.0;
-    ds *= x * x / (d * d);
-    s += ds;
-  }
-  while (ds > s * 1e-6);
-  return s;
 }

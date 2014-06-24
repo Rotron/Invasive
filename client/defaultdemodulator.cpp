@@ -4,6 +4,7 @@
 #include "firfilter.h"
 #include "cfloat"
 #include "ringbuffer.h"
+#include "window.h"
 #include <iostream>
 
 namespace {
@@ -27,8 +28,8 @@ FramePtr DefaultDemodulator::decode(const FrameAudio& frame_audio)
     QVector<double> buffer;
     buffer.reserve(frame_audio.count());
 
-    FIRFilter bandpass(FIRFilter::FIR_BANDPASS, SAMPLING_RATE, 220, 900, 2500);
-    FIRFilter lowpass(FIRFilter::FIR_LOWPASS, 528000, 12000, SAMPLING_RATE / 2);
+    FIRFilter bandpass(FIRFilter::FIR_BANDPASS, KaiserBessel<220>(), SAMPLING_RATE, 220, 900, 2500);
+    FIRFilter lowpass(FIRFilter::FIR_LOWPASS, KaiserBessel<220>(), 528000, 12000, SAMPLING_RATE / 2);
     int index = 0;
     for (double value : frame_audio) {
         double low = lowpass.process(value);

@@ -1,5 +1,6 @@
 #include "framedetector.h"
 #include "frameaudio.h"
+#include "window.h"
 
 namespace {
 
@@ -31,9 +32,9 @@ FrameDetector::FrameDetector(const QAudioFormat& format, QObject *parent) :
     bufsignal_(SN_LEVEL_BUFFER_SIZE),
     bufflag_(FRAME_FLAG_BUFFER_SIZE),
     bufthreshold_(THRESHOLD_BUFFER_SIZE),
-    lowpass_(FIRFilter::FIR_LOWPASS,   SAMPLING_RATE, 1200, 600.0),
-    bandpass_(FIRFilter::FIR_BANDPASS, SAMPLING_RATE, 900,  1200.0, 2200.0),
-    bandstop_(FIRFilter::FIR_BANDSTOP, SAMPLING_RATE, 900,  1200.0, 2200.0),
+    lowpass_(FIRFilter::FIR_LOWPASS,   KaiserBessel<220>(), SAMPLING_RATE, 1200, 600.0),
+    bandpass_(FIRFilter::FIR_BANDPASS, KaiserBessel<220>(), SAMPLING_RATE, 900,  1200.0, 2200.0),
+    bandstop_(FIRFilter::FIR_BANDSTOP, KaiserBessel<220>(), SAMPLING_RATE, 900,  1200.0, 2200.0),
     total_count_(0),
     frame_sequence_(0),
     prev_count_(0),

@@ -37,21 +37,12 @@ Modem::~Modem()
 
 QAudioFormat Modem::audioFormat() const
 {
-#if defined(Q_OS_LINUX)
-    if (pulse_audio_) {
-        return pulse_audio_->format();
-    }
-    else {
-        return QAudioFormat();
-    }
-#else
     if (audio_input_) {
         return audio_input_->format();
     }
     else {
         return QAudioFormat();
     }
-#endif
 }
 
 bool Modem::setAudioDeviceIndex(int index)
@@ -66,10 +57,7 @@ bool Modem::setAudioDeviceIndex(int index)
         format.setCodec("audio/pcm");
         format.setSampleType(QAudioFormat::SignedInt);
         format.setByteOrder(QAudioFormat::LittleEndian);
-#if defined(Q_OS_LINUX)
-        pulse_audio_.reset(new PulseAudio(format, device.deviceName()));
-        connect(pulse_audio_.data(), SIGNAL(received(QByteArray)), this, SLOT(decodeSoundData(QByteArray)));
-#else
+
         if (!device.isFormatSupported(format)) {
             format = device.nearestFormat(format);
         }
@@ -85,7 +73,6 @@ bool Modem::setAudioDeviceIndex(int index)
 
         connect(audio_input_.data(), SIGNAL(notify()), this, SLOT(readSoundData()));
         audio_device_ = audio_input_->start();
-#endif
         return true;
     }
     else {

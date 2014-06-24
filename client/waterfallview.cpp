@@ -3,8 +3,12 @@
 namespace {
 
 const int VIEW_HEIGHT = 140;
+const int FFT_SIZE    = 1024;
+const int FFT_GAIN    = 20000;
 
 }
+
+extern "C" void rdft(int, int, double *, int *, double *);
 
 WaterfallView::WaterfallView(QWidget *parent) :
     QGLWidget(QGLFormat(QGL::SampleBuffers), parent),
@@ -21,9 +25,23 @@ WaterfallView::WaterfallView(QWidget *parent) :
     timer_.start(24);
 }
 
-void WaterfallView::updateAudioSpectrum(const QVector<float>& data)
+void WaterfallView::updateAudio(const QByteArray& audio)
 {
-    line_buffer_ = data;
+    QVector<float> spectrum(FFT_SIZE, 0);
+    for (int i = 0; i < audio.size() / FFT_SIZE / 2; ++i) {
+        QVector<double> signal(FFT_SIZE, 0);
+        for (int j = 0; j < FFT_SIZE; ++j) {
+            signal[j] = ((short*)audio.data())[j + FFT_SIZE * i]
+                    * 0.5 * (1.0 - cos(2 * M_PI * (1.0 * j / FFT_SIZE)));
+        }
+        static int fft_ip[FFT_SIZE / 2] = {0};
+        static double fft_w[FFT_SIZE / 2] = {0};
+        rdft(FFT_SIZE, -1, signal.data(), fft_ip, fft_w);
+        for (int j = 0; j < FFT_SIZE; ++j) {
+            spectrum[j] = signal[j] / (audio.size() / FFT_SIZE) / FFT_GAIN;
+        }
+        line_buffer_ = spectrum.mid(0, FFT_SIZE / 2);
+    }
 }
 
 void WaterfallView::setDecodedPackets(int count)
@@ -131,6 +149,14 @@ void WaterfallView::paintEvent(QPaintEvent *event)
 
     QPainter painter(this);
     painter.setRenderHint(QPainter::Antialiasing);
+
+    QLinearGradient gradient(rect().right() - 300, 0, rect().right(), 0);
+    gradient.setColorAt(1.0, QColor::fromRgbF(0.0, 0.0, 0.0, 0.8));
+    gradient.setColorAt(0.5, QColor::fromRgbF(0.0, 0.0, 0.0, 0.8));
+    gradient.setColorAt(0.0, QColor::fromRgbF(0.0, 0.0, 0.0, 0));
+    QBrush brush(gradient);
+    painter.fillRect(rect(), brush);
+
     painter.setPen(Qt::white);
     {
         QRect text_rect = rect();
@@ -227,13 +253,15 @@ void WaterfallView::setupShader()
         "uniform sampler2D texture;",
         "void main(void)",
         "{",
-        "  const vec4 color1 = vec4(0.1, 0.1, 0.1, 1.0);"
+        "  const vec4 color1 = vec4(0.1, 0.1, 1.1, 1.0);"
         "  const vec4 color2 = vec4(0.1, 1.0, 0.1, 1.0);"
-        "  const vec4 color3 = vec4(1.0, 1.0, 1.0, 1.0);"
+        "  const vec4 color3 = vec4(0.1, 1.0, 1.0, 1.0);"
+        "  const vec4 color4 = vec4(1.0, 1.0, 1.0, 1.0);"
         "  float value = texture2D(texture, gl_TexCoord[0].xy).r;"
-        "  if (value > 0.66) gl_FragColor = color3;",
-        "  if (value > 0.33) gl_FragColor = mix(color2, color3, (value - 0.33) / 0.33);",
-        "  else gl_FragColor = mix(color1, color2, value / 0.33);",
+        "  if (value > 1.0) gl_FragColor = color4;",
+        "  else if (value > 0.66) gl_FragColor = mix(color3, color4, (value - 0.66) / 0.33);",
+        "  else if (value > 0.33) gl_FragColor = mix(color2, color3, (value - 0.33) / 0.33);",
+        "  else if (value > 0.1) gl_FragColor = mix(color1, color2, value / 0.33);",
         "}",
     };
     glShaderSource(frag, sizeof(frag_source) / sizeof(frag_source[0]), frag_source, NULL);

@@ -68,8 +68,8 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(modem_, SIGNAL(frameDecoded(FramePtr)), frame_list_, SLOT(addFrame(FramePtr)));
     connect(modem_, SIGNAL(frameDecoded(FramePtr)), server_, SLOT(writeFrame(FramePtr)));
     connect(modem_, SIGNAL(frameDecoded(FramePtr)), this, SLOT(frameDecoded()));
-    connect(modem_, SIGNAL(audioSpectrumUpdated(QVector<float>)),
-            waterfall_, SLOT(updateAudioSpectrum(QVector<float>)));
+    connect(modem_, SIGNAL(audioReceived(QByteArray)),
+            waterfall_, SLOT(updateAudio(QByteArray)));
     connect(modem_, SIGNAL(decodeRatioUpdated(double)),
             waterfall_, SLOT(setDecodeRatio(double)));
 

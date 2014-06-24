@@ -21,7 +21,7 @@ private:
 
 signals:
     void frameDecoded(const FramePtr& frame);
-    void audioSpectrumUpdated(const QVector<float>& data);
+    void audioReceived(const QByteArray& data);
     void decodeRatioUpdated(double ratio);
 
 private slots:

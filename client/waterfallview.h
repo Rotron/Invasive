@@ -17,7 +17,7 @@ private:
     void setupShader();
 
 public slots:
-    void updateAudioSpectrum(const QVector<float>& data);
+    void updateAudio(const QByteArray& audio);
     void setDecodedPackets(int count);
     void setCompletePackets(int count);
     void setDecodeRatio(double ratio);

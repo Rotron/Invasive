@@ -146,10 +146,10 @@ void Modem::decodeSoundData(const QByteArray& audio)
         static double fft_w[FFT_SIZE / 2] = {0};
         rdft(FFT_SIZE, -1, signal.data(), fft_ip, fft_w);
         for (int j = 0; j < FFT_SIZE; ++j) {
-            spectrum[j] += signal[j] / (audio.size() / FFT_SIZE) / FFT_GAIN;
+            spectrum[j] = signal[j] / (audio.size() / FFT_SIZE) / FFT_GAIN;
         }
+        emit audioSpectrumUpdated(spectrum.mid(0, FFT_SIZE / 2));
     }
-    emit audioSpectrumUpdated(spectrum.mid(0, FFT_SIZE / 2));
 }
 
 void Modem::frameDetected(const FrameAudioPtr& frame)

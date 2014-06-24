@@ -71,8 +71,8 @@ bool Modem::setAudioDeviceIndex(int index)
         audio_input_.reset(new QAudioInput(device, format));
         audio_input_->setNotifyInterval(40);
 
-        connect(audio_input_.data(), SIGNAL(notify()), this, SLOT(readSoundData()));
         audio_device_ = audio_input_->start();
+        connect(audio_device_, SIGNAL(readyRead()), this, SLOT(readSoundData()));
         return true;
     }
     else {

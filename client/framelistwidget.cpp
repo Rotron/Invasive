@@ -266,6 +266,10 @@ void FrameListDelegate::paint(
         painter->drawText(text_rect, "Broken", text_option);
     }
 
+#ifdef Q_OS_LINUX
+    painter->setCompositionMode(QPainter::CompositionMode_Multiply);
+#endif
+
     painter->setOpacity(0.5);
     QStyledItemDelegate::paint(painter, option, index);
     painter->setOpacity(1.0);

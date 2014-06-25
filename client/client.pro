@@ -13,7 +13,6 @@ SOURCES += \
     modem.cpp \
     firfilter.cpp \
     frameaudio.cpp \
-    defaultdemodulator.cpp \
     frame.cpp \
     abstractframedetector.cpp \
     framedetector.cpp \
@@ -23,7 +22,8 @@ SOURCES += \
     waterfallview.cpp \
     ../vendor/fft/fft8g.c \
     framelogger.cpp \
-    demodulatorset.cpp
+    demodulatorset.cpp \
+    demodulator.cpp
 
 HEADERS  += \
     mainwindow.h \
@@ -34,7 +34,6 @@ HEADERS  += \
     stdafx.h \
     forward.h \
     abstractdemodulator.h \
-    defaultdemodulator.h \
     frame.h \
     abstractframedetector.h \
     framedetector.h \
@@ -45,7 +44,8 @@ HEADERS  += \
     waterfallview.h \
     framelogger.h \
     demodulatorset.h \
-    window.h
+    window.h \
+    demodulator.h
 
 win32:LIBS += -lglew32
 linux:LIBS += -lGLEW

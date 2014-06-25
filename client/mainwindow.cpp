@@ -1,6 +1,6 @@
 #include "mainwindow.h"
 #include "framelistwidget.h"
-#include "defaultdemodulator.h"
+#include "demodulator.h"
 #include "framedetector.h"
 #include "frame.h"
 #include "modem.h"
@@ -9,6 +9,7 @@
 #include "socketserver.h"
 #include "waterfallview.h"
 #include "framelogger.h"
+#include "window.h"
 
 namespace {
 
@@ -80,8 +81,15 @@ MainWindow::MainWindow(QWidget *parent) :
     initializeMenuBar();
 
     modem_->addFrameDetector(std::make_shared<FrameDetector>(modem_->audioFormat()));
-    modem_->addDemodulatorFacory(std::make_shared<DefaultDemodulatorFactory>(true));
-    modem_->addDemodulatorFacory(std::make_shared<DefaultDemodulatorFactory>(false));
+
+    modem_->addDemodulatorFacory(std::make_shared<DefaultDemodulatorFactory>(
+                                     Demodulator::Settings({true, KaiserBessel<220>()})));
+    modem_->addDemodulatorFacory(std::make_shared<DefaultDemodulatorFactory>(
+                                     Demodulator::Settings({true, Flattop()})));
+    modem_->addDemodulatorFacory(std::make_shared<DefaultDemodulatorFactory>(
+                                     Demodulator::Settings({true, KaiserBessel<0>()})));
+    modem_->addDemodulatorFacory(std::make_shared<DefaultDemodulatorFactory>(
+                                     Demodulator::Settings({false, KaiserBessel<0>()})));
 }
 
 MainWindow::~MainWindow()

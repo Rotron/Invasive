@@ -1,4 +1,4 @@
-#include "defaultdemodulator.h"
+#include "demodulator.h"
 #include "frame.h"
 #include "frameaudio.h"
 #include "firfilter.h"
@@ -17,19 +17,19 @@ const double THRESHOLD_WIDTH_RATIO = 2.0;
 
 }
 
-DefaultDemodulator::DefaultDemodulator(bool verify_fcs) :
-    verify_fcs_(verify_fcs)
+Demodulator::Demodulator(const Settings& settings) :
+    settings_(settings)
 {
 
 }
 
-FramePtr DefaultDemodulator::decode(const FrameAudio& frame_audio)
+FramePtr Demodulator::decode(const FrameAudio& frame_audio)
 {
     QVector<double> buffer;
     buffer.reserve(frame_audio.count());
 
-    FIRFilter bandpass(FIRFilter::FIR_BANDPASS, KaiserBessel<220>(), SAMPLING_RATE, 220, 900, 2500);
-    FIRFilter lowpass(FIRFilter::FIR_LOWPASS, KaiserBessel<220>(), 528000, 12000, SAMPLING_RATE / 2);
+    FIRFilter bandpass(FIRFilter::FIR_BANDPASS, settings_.window, SAMPLING_RATE, 220, 900, 2500);
+    FIRFilter lowpass(FIRFilter::FIR_LOWPASS, settings_.window, 528000, 12000, SAMPLING_RATE / 2);
     int index = 0;
     for (double value : frame_audio) {
         double low = lowpass.process(value);
@@ -72,12 +72,12 @@ FramePtr DefaultDemodulator::decode(const FrameAudio& frame_audio)
 
     for (int i = 0; i <= THRESHOLD_RESOLUTION; ++i) {
         FramePtr frame;
-        process(verify_fcs_, center - std::fabs(center - min / THRESHOLD_WIDTH_RATIO) *
+        process(settings_.verfy_fcs, center - std::fabs(center - min / THRESHOLD_WIDTH_RATIO) *
                 (1.0 * i / THRESHOLD_RESOLUTION), diff_buff, &frame);
         if (frame) {
             return frame;
         }
-        process(verify_fcs_, center + std::fabs(center - max / THRESHOLD_WIDTH_RATIO) *
+        process(settings_.verfy_fcs, center + std::fabs(center - max / THRESHOLD_WIDTH_RATIO) *
                 (1.0 * i / THRESHOLD_RESOLUTION), diff_buff, &frame);
         if (frame) {
             return frame;
@@ -87,7 +87,7 @@ FramePtr DefaultDemodulator::decode(const FrameAudio& frame_audio)
     return FramePtr();
 }
 
-void DefaultDemodulator::process(bool verify_fcs, double center, const QVector<double>& diff, FramePtr* result)
+void Demodulator::process(bool verify_fcs, double center, const QVector<double>& diff, FramePtr* result)
 {
     QVector<bool> bit_buffer;
     RingBuffer<double> cb(BITS_PER_BYTE);
@@ -182,14 +182,14 @@ void DefaultDemodulator::process(bool verify_fcs, double center, const QVector<d
     return;
 }
 
-DefaultDemodulatorFactory::DefaultDemodulatorFactory(bool verify_fcs) :
-    verify_fcs_(verify_fcs)
+DefaultDemodulatorFactory::DefaultDemodulatorFactory(const Demodulator::Settings& settings) :
+    settings_(settings)
 {
 
 }
 
 DemodulatorInterface* DefaultDemodulatorFactory::make() const
 {
-    return new DefaultDemodulator(verify_fcs_);
+    return new Demodulator(settings_);
 }
 

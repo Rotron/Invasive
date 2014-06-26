@@ -165,6 +165,7 @@ void Demodulator::process(bool verify_fcs, double center, const QVector<double>&
                     }
                     return;
                 }
+                frame_data.clear();
             }
             else {
                 frame_data += c;

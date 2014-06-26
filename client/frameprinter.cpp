@@ -61,7 +61,7 @@ QString toHtmlText(const FramePtr& frame)
     html += QString("<br>%0").arg(addresses.join(QString(" < ").toHtmlEscaped()));
     html += "</h4></font>";
 
-    html += "<div><br><font color=\"#dd0000\">" + QString("%0").arg(FramePrinter::asciiInfo(frame)) + "<br></font></div>";
+    html += "<div><br><font color=\"#dd0000\">" + FramePrinter::asciiInfo(frame).toHtmlEscaped() + "<br></font></div>";
     html += "<div>" + frame->info().toHex() + "</div>";
     html += "<hr>";
 

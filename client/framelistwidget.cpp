@@ -198,8 +198,8 @@ void FrameListDelegate::paint(
         painter->drawText(text_rect, callsign, text_option);
     }
 
-    if (!frame->addresses().isEmpty()) {
-        QString callsign = frame->addresses().last().callsign;
+    if (frame->addresses().size() >= 2) {
+        QString callsign = frame->addresses()[1].callsign;
         QByteArray sha1 = QCryptographicHash::hash(callsign.toUtf8(), QCryptographicHash::Sha1);
         QColor color;
         color.setHsl(static_cast<unsigned char>((sha1[0] + sha1[1] * 256) % 360), 100, 140);

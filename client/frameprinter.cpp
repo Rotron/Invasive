@@ -21,6 +21,15 @@ QString asciiInfo(const FramePtr& frame)
     return QString::fromUtf8(text);
 }
 
+namespace {
+QString addr2str(const Frame::Address& addr) {
+    return QString("%0/%1%2")
+            .arg(addr.callsign)
+            .arg(addr.ssid)
+            .arg(addr.repeated ? "R" : "");
+}
+}
+
 QString toPlainText(const FramePtr& frame)
 {
     QString text;
@@ -30,13 +39,22 @@ QString toPlainText(const FramePtr& frame)
             .arg(frame->info().size())
             .arg(frame->isValid() ? "" : " Broken");
 
-    QStringList addresses;
-    for (const Frame::Address& addr : frame->addresses()) {
-        QString addr_str = QString("%0/%1").arg(addr.callsign).arg(addr.ssid);
-        if (addr.repeated) addr_str += "R";
-        addresses += addr_str;
+    QString addresses;
+    if (frame->addresses().size() >= 2) {
+        addresses += addr2str(frame->addresses()[1]);
+        addresses += " > ";
+        if (frame->addresses().size() >= 3) {
+            QStringList repeaters;
+            for (int i = 2; i < frame->addresses().size(); ++i) {
+                repeaters.push_back(addr2str(frame->addresses()[i]));
+            }
+            addresses += repeaters.join(", ");
+            addresses += " > ";
+        }
+        addresses += addr2str(frame->addresses()[0]);
     }
-    text += QString("%0\n\n").arg(addresses.join(" < "));
+
+    text += QString("%0\n\n").arg(addresses);
     text += QString("%0\n\n").arg(FramePrinter::asciiInfo(frame));
     text += frame->info().toHex() + "\n";
 
@@ -52,13 +70,22 @@ QString toHtmlText(const FramePtr& frame)
             .arg(frame->info().size())
             .arg(frame->isValid() ? "" : " <font color=\"red\">Broken</font>");
 
-    QStringList addresses;
-    for (const Frame::Address& addr : frame->addresses()) {
-        QString addr_str = QString("%0/%1").arg(addr.callsign).arg(addr.ssid);
-        if (addr.repeated) addr_str += "R";
-        addresses += addr_str;
+    QString addresses;
+    if (frame->addresses().size() >= 2) {
+        addresses += addr2str(frame->addresses()[1]);
+        addresses += " > ";
+        if (frame->addresses().size() >= 3) {
+            QStringList repeaters;
+            for (int i = 2; i < frame->addresses().size(); ++i) {
+                repeaters.push_back(addr2str(frame->addresses()[i]));
+            }
+            addresses += repeaters.join(", ");
+            addresses += " > ";
+        }
+        addresses += addr2str(frame->addresses()[0]);
     }
-    html += QString("<br>%0").arg(addresses.join(QString(" < ").toHtmlEscaped()));
+
+    html += QString("<br>%0").arg(addresses.toHtmlEscaped());
     html += "</h4></font>";
 
     html += "<div><br><font color=\"#dd0000\">" + FramePrinter::asciiInfo(frame).toHtmlEscaped() + "<br></font></div>";

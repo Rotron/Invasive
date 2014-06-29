@@ -4,6 +4,7 @@
 #include "demodulatorset.h"
 #include "frameaudio.h"
 #include "frame.h"
+#include "wavplayer.h"
 
 namespace {
 
@@ -78,18 +79,16 @@ bool Modem::setAudioDeviceIndex(int index)
 
 void Modem::decodeWavFile(const QString& path)
 {
-    QFile file(path);
-    if (file.open(QFile::ReadOnly) && file.size() > 42) {
-        file.read(22);
-        int channels = qFromLittleEndian<quint16>(reinterpret_cast<const uchar*>(file.read(2).data()));
-        int rate = qFromLittleEndian<quint32>(reinterpret_cast<const uchar*>(file.read(4).data()));
-        file.read(14);
-        if (channels != 1 || rate != SAMPLING_RATE) {
-            return;
-        }
-        else {
-            decodeSoundData(file.readAll());
-        }
+    WavPlayer *player = new WavPlayer(path);
+    if (player->channels() == 1 || player->samplingRate() == SAMPLING_RATE) {
+        connect(player, SIGNAL(audioReaded(QByteArray)), this, SLOT(decodeSoundData(QByteArray)));
+        player->moveToThread(&detector_thread_);
+        player->play();
+        player->deleteLater();
+    }
+    else {
+        QMessageBox::warning(qApp->activeWindow(), "Error", "Wav file must be monoral 4.8 kHz audio");
+        delete player;
     }
 }
 

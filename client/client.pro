@@ -23,7 +23,8 @@ SOURCES += \
     ../vendor/fft/fft8g.c \
     framelogger.cpp \
     demodulatorset.cpp \
-    demodulator.cpp
+    demodulator.cpp \
+    wavplayer.cpp
 
 HEADERS  += \
     mainwindow.h \
@@ -45,7 +46,8 @@ HEADERS  += \
     framelogger.h \
     demodulatorset.h \
     window.h \
-    demodulator.h
+    demodulator.h \
+    wavplayer.h
 
 win32:LIBS += -lglew32
 linux:LIBS += -lGLEW

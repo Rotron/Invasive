@@ -157,7 +157,7 @@ void MainWindow::openWavFile()
     QString path = QFileDialog::getOpenFileName(
                 this, "Open wav file", QDir::homePath(), "Wav (*.wav)");
 
-    modem_->decodeWavFile(path);
+    if (!path.isEmpty()) modem_->decodeWavFile(path);
 }
 
 void MainWindow::closeEvent(QCloseEvent *event)

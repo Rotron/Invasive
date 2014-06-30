@@ -154,6 +154,15 @@ void MainWindow::saveSelectedAsFile()
     saveAsFile(true);
 }
 
+void MainWindow::openLogFile()
+{
+    QString log_path = settings_.value("log/path").toString();
+    QUrl url;
+    url.setScheme("file");
+    url.setPath(log_path);
+    QDesktopServices::openUrl(url);
+}
+
 void MainWindow::openWavFile()
 {
     QString path = QFileDialog::getOpenFileName(
@@ -198,6 +207,10 @@ void MainWindow::initializeMenuBar()
     connect(save_selected_act_, SIGNAL(triggered()), this, SLOT(saveSelectedAsFile()));
     save_selected_act_->setEnabled(false);
     file_menu->addAction(save_selected_act_);
+
+    QAction *open_logfile_act = new QAction("Open log file", this);
+    connect(open_logfile_act, SIGNAL(triggered()), this, SLOT(openLogFile()));
+    file_menu->addAction(open_logfile_act);
 
     file_menu->addSeparator();
     QAction *open_wav_act = new QAction(tr("Decode wav file..."), this);

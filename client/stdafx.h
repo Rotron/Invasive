@@ -37,6 +37,7 @@
 #include <QFormLayout>
 #include <QSpinBox>
 #include <QDialogButtonBox>
+#include <QDesktopServices>
 #include <QTcpServer>
 #include <QTcpSocket>
 #include <QSet>

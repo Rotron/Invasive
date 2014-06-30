@@ -133,7 +133,7 @@ void Modem::decodeSoundData(const QByteArray& audio)
     emit audioReceived(audio);
 }
 
-void Modem::frameDetected(const FrameAudioPtr& frame)
+void Modem::decodeFrame(const FrameAudioPtr& frame)
 {
     DemodulatorSet *set = new DemodulatorSet(factories_, frame);
     connect(set, SIGNAL(decoded(FramePtr)), this, SLOT(decoded(FramePtr)));
@@ -145,7 +145,8 @@ void Modem::frameDetected(const FrameAudioPtr& frame)
 void Modem::addFrameDetector(const FrameDetectorPtr& detector)
 {
     if (detector) {
-        connect(detector.get(), SIGNAL(detected(FrameAudioPtr)), this, SLOT(frameDetected(FrameAudioPtr)));
+        connect(detector.get(), SIGNAL(detected(FrameAudioPtr)), this, SLOT(decodeFrame(FrameAudioPtr)));
+        connect(detector.get(), SIGNAL(detected(FrameAudioPtr)), this, SIGNAL(frameDetected()));
         detector->moveToThread(&detector_thread_);
         detectors_.push_back(detector);
     }

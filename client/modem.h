@@ -21,13 +21,14 @@ private:
 
 signals:
     void frameDecoded(const FramePtr& frame);
+    void frameDetected();
     void audioReceived(const QByteArray& data);
     void decodeRatioUpdated(double ratio);
 
 private slots:
     void readSoundData();
     void decodeSoundData(const QByteArray& audio);
-    void frameDetected(const FrameAudioPtr& frame);
+    void decodeFrame(const FrameAudioPtr& frame);
     void decoded(const FramePtr& frame);
 
 private:

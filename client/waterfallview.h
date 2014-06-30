@@ -21,6 +21,8 @@ public slots:
     void setDecodedPackets(int count);
     void setCompletePackets(int count);
     void setDecodeRatio(double ratio);
+    void detected();
+    void decorded();
 
 private slots:
     void animate();
@@ -37,4 +39,7 @@ private:
     int decoded_packets_;
     int complete_packets_;
     double decode_ratio_;
+
+    double detected_brightness_;
+    double decorded_brightness_;
 };

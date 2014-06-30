@@ -15,7 +15,9 @@ WaterfallView::WaterfallView(QWidget *parent) :
     count_(0),
     decoded_packets_(0),
     complete_packets_(0),
-    decode_ratio_(0)
+    decode_ratio_(0),
+    detected_brightness_(0.0),
+    decorded_brightness_(0.0)
 {
     setAutoFillBackground(false);
     setMinimumHeight(VIEW_HEIGHT);
@@ -44,6 +46,16 @@ void WaterfallView::updateAudio(const QByteArray& audio)
     }
 }
 
+void WaterfallView::detected()
+{
+    detected_brightness_ = 1.0;
+}
+
+void WaterfallView::decorded()
+{
+    decorded_brightness_ = 1.0;
+}
+
 void WaterfallView::setDecodedPackets(int count)
 {
     decoded_packets_ = count;
@@ -61,6 +73,10 @@ void WaterfallView::setDecodeRatio(double ratio)
 
 void WaterfallView::animate()
 {
+    detected_brightness_ /= 1.1;
+    detected_brightness_ = qMax(detected_brightness_, 0.2);
+    decorded_brightness_ /= 1.1;
+    decorded_brightness_ = qMax(decorded_brightness_, 0.2);
     update();
 }
 
@@ -160,23 +176,46 @@ void WaterfallView::paintEvent(QPaintEvent *event)
     painter.setPen(Qt::white);
     {
         QRect text_rect = rect();
-        text_rect.setTop(text_rect.top() + 8);
+        text_rect.setTop(text_rect.top() + 28);
         text_rect.setRight(text_rect.right() - 10);
         painter.drawText(text_rect, Qt::AlignRight, QString("Decoded packets: %0").arg(decoded_packets_));
     }
     {
         QRect text_rect = rect();
-        text_rect.setTop(text_rect.top() + 28);
+        text_rect.setTop(text_rect.top() + 48);
         text_rect.setRight(text_rect.right() - 10);
         painter.drawText(text_rect, Qt::AlignRight, QString("Complete packets: %0").arg(complete_packets_));
     }
     {
         QRect text_rect = rect();
-        text_rect.setTop(text_rect.top() + 48);
+        text_rect.setTop(text_rect.top() + 68);
         text_rect.setRight(text_rect.right() - 10);
         painter.drawText(text_rect, Qt::AlignRight,
                          QString("Decode ratio: %0%").arg(QString::number(decode_ratio_ * 100 ,'f', 2)));
     }
+
+    {
+        painter.setPen(Qt::white);
+        QRect text_rect = rect();
+        text_rect.setTop(text_rect.top() + 8);
+        text_rect.setRight(text_rect.right() - 10);
+        painter.drawText(text_rect, Qt::AlignRight, "DTD");
+        painter.setPen(Qt::NoPen);
+        painter.setBrush(QBrush(QColor(0, 250, 200, 255 * detected_brightness_)));
+        painter.drawEllipse(text_rect.right() - 45, text_rect.top(), 15, 15);
+    }
+
+    {
+        painter.setPen(Qt::white);
+        QRect text_rect = rect();
+        text_rect.setTop(text_rect.top() + 8);
+        text_rect.setRight(text_rect.right() - 70);
+        painter.drawText(text_rect, Qt::AlignRight, "DCD");
+        painter.setPen(Qt::NoPen);
+        painter.setBrush(QBrush(QColor(200, 250, 0, 255 * decorded_brightness_)));
+        painter.drawEllipse(text_rect.right() - 45, text_rect.top(), 15, 15);
+    }
+
     painter.end();
 }
 

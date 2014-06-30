@@ -55,7 +55,6 @@ void FrameDetector::processAudio(const QByteArray& data)
 
     const int16_t* ptr = reinterpret_cast<const int16_t*>(data.data());
 
-    auto ST = QDateTime::currentDateTime();
     for (int i = 0; i < samples; ++i) {
 
         double sample = 0.0;
@@ -67,12 +66,13 @@ void FrameDetector::processAudio(const QByteArray& data)
 
         uint64_t count = i + total_count_;
 
-        bufs1200_.push_back(sin(M_PI * 2 / sample_rate * 1200.0 * count) * sample);
-        bufc1200_.push_back(cos(M_PI * 2 / sample_rate * 1200.0 * count) * sample);
-        bufs2200_.push_back(sin(M_PI * 2 / sample_rate * 2200.0 * count) * sample);
-        bufc2200_.push_back(cos(M_PI * 2 / sample_rate * 2200.0 * count) * sample);
+        double sample_bandpassed = bandpass_.process(sample);
+        bufs1200_.push_back(sin(M_PI * 2 / sample_rate * 1200.0 * count) * sample_bandpassed);
+        bufc1200_.push_back(cos(M_PI * 2 / sample_rate * 1200.0 * count) * sample_bandpassed);
+        bufs2200_.push_back(sin(M_PI * 2 / sample_rate * 2200.0 * count) * sample_bandpassed);
+        bufc2200_.push_back(cos(M_PI * 2 / sample_rate * 2200.0 * count) * sample_bandpassed);
 
-        double ss = std::fabs(bandpass_.process(sample));
+        double ss = std::fabs(sample_bandpassed);
         double ns = std::fabs(sample);
 
         if (signal_level_ >= LEVEL_DECREASE_SPEED) signal_level_ -= LEVEL_DECREASE_SPEED;

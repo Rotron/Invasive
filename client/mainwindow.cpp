@@ -73,6 +73,8 @@ MainWindow::MainWindow(QWidget *parent) :
             waterfall_, SLOT(updateAudio(QByteArray)));
     connect(modem_, SIGNAL(decodeRatioUpdated(double)),
             waterfall_, SLOT(setDecodeRatio(double)));
+    connect(modem_, SIGNAL(frameDetected()), waterfall_, SLOT(detected()));
+    connect(modem_, SIGNAL(frameDecoded(FramePtr)), waterfall_, SLOT(decorded()));
 
     QString log_path = settings_.value("log/path").toString();
     logger_ = new FrameLogger(log_path, this);

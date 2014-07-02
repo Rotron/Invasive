@@ -16,6 +16,7 @@ public:
 
 private:
     void process(bool verify_fcs, double center, const QVector<double>& diff, FramePtr* result);
+    void addressRecovery(QByteArray* frame_data);
 
 private:
     Settings settings_;

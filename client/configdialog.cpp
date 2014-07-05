@@ -4,7 +4,6 @@
 namespace {
 
 const int WINDOW_WIDTH = 320;
-const int WINDOW_HEIGHT = 160;
 
 }
 
@@ -13,7 +12,7 @@ ConfigDialog::ConfigDialog(QWidget *parent) :
     settings_("Invasive", "settings")
 {
     setModal(true);
-    setFixedSize(WINDOW_WIDTH, WINDOW_HEIGHT);
+    setMinimumWidth(WINDOW_WIDTH);
     setWindowFlags(Qt::MSWindowsFixedSizeDialogHint | Qt::Dialog);
     setWindowFlags(this->windowFlags() & ~Qt::WindowContextHelpButtonHint);
 

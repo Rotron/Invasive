@@ -28,6 +28,16 @@ QString addr2str(const Frame::Address& addr) {
             .arg(addr.ssid)
             .arg(addr.repeated ? "R" : "");
 }
+
+QString toSpacedHex(const QByteArray data) {
+    QByteArray hex = data.toHex();
+    QByteArray spaced;
+    for (int i = 0; i < hex.size(); ++i) {
+        spaced.append(hex[i]);
+        if ((i + 1) % 2 == 0) spaced.append(" ");
+    }
+    return spaced;
+}
 }
 
 QString toPlainText(const FramePtr& frame)
@@ -56,7 +66,7 @@ QString toPlainText(const FramePtr& frame)
 
     text += QString("%0\n\n").arg(addresses);
     text += QString("%0\n\n").arg(FramePrinter::asciiInfo(frame));
-    text += frame->info().toHex() + "\n";
+    text += toSpacedHex(frame->info()) + "\n";
 
     return text;
 }
@@ -89,7 +99,7 @@ QString toHtmlText(const FramePtr& frame)
     html += "</h4></font>";
 
     html += "<div><br><font color=\"#dd0000\">" + FramePrinter::asciiInfo(frame).toHtmlEscaped() + "<br></font></div>";
-    html += "<div>" + frame->info().toHex() + "</div>";
+    html += "<div>" + toSpacedHex(frame->info()) + "</div>";
     html += "<hr>";
 
     return html;

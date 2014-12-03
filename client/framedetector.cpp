@@ -46,7 +46,7 @@ FrameDetector::FrameDetector(const QAudioFormat& format, QObject *parent) :
     input_level_(0.0),
     threshold_(0)
 {
-
+    timer_.start();
 }
 
 void FrameDetector::processAudio(const QByteArray& data)
@@ -109,11 +109,12 @@ void FrameDetector::processAudio(const QByteArray& data)
                         str += "[*] ";
                     }
                     str += QString::number(seq_count_) + "\t";
-                    //str += QString::number(1.0 * seq_count_ / (format_.sampleRate() * 4 / 480.0)) + "sec";
+                    str += QString::number(timer_.elapsed() / 1000.0) + "sec";
                     qDebug() << str;
                     emit bitDecoded(str);
                 }
                 seq_count_ = 1;
+                timer_.restart();
             }
             prev_bit_ = bit;
         }

@@ -4,6 +4,7 @@
 #include "forward.h"
 #include "abstractframedetector.h"
 #include "ringbuffer.h"
+#include <QElapsedTimer>
 
 class FrameDetector : public AbstractFrameDetector
 {
@@ -31,6 +32,7 @@ private:
     uint32_t frame_sequence_;
     uint64_t prev_count_;
     uint64_t seq_count_;
+    QElapsedTimer timer_;
     bool prev_bit_;
     double level_;
     double signal_level_;

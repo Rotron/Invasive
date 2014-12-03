@@ -9,7 +9,7 @@ public:
     explicit FrameLogger(const QString& path, QObject *parent = 0);
 
 public slots:
-    void writeFrame(const FramePtr& frame);
+    void writeFrame(const QString& frame);
 
 private:
     QFile file_;

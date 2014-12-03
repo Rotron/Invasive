@@ -102,13 +102,13 @@ void FrameDetector::processAudio(const QByteArray& data)
                 seq_count_++;
             } else {
                 if (seq_count_ >= 10) {
-                    QString str;
+                    QString str = QDateTime::currentDateTime().toString();
                     if (bit) {
-                        str += "[ ] ";
+                        str += " [ ] ";
                     } else {
-                        str += "[*] ";
+                        str += " [*] ";
                     }
-                    str += QString::number(seq_count_) + "\t";
+                    str += QString::number(seq_count_) + "\t\t";
                     str += QString::number(timer_.elapsed() / 1000.0) + "sec";
                     qDebug() << str;
                     emit bitDecoded(str);

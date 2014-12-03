@@ -80,7 +80,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     QString log_path = settings_.value("log/path").toString();
     logger_ = new FrameLogger(log_path, this);
-    connect(modem_, SIGNAL(frameDecoded(FramePtr)), logger_, SLOT(writeFrame(FramePtr)));
+    //connect(modem_, SIGNAL(frameDecoded(FramePtr)), logger_, SLOT(writeFrame(FramePtr)));
 
     initializeMenuBar();
 
@@ -103,7 +103,8 @@ MainWindow::~MainWindow()
 
 void MainWindow::bitDecoded(const QString& str)
 {
-    frame_browser_->append(str);
+    //frame_browser_->append(str);
+    logger_->writeFrame(str);
 }
 
 void MainWindow::frameDecoded()

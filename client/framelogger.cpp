@@ -12,9 +12,9 @@ FrameLogger::FrameLogger(const QString& path, QObject *parent) :
     }
 }
 
-void FrameLogger::writeFrame(const FramePtr& frame)
+void FrameLogger::writeFrame(const QString& frame)
 {
-    QString text = FramePrinter::toPlainText(frame) + "\n";
+    QString text = frame + "\n";
     file_.write(text.toUtf8());
     file_.flush();
 }

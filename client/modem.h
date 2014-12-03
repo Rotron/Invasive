@@ -24,6 +24,7 @@ signals:
     void frameDetected();
     void audioReceived(const QByteArray& data);
     void decodeRatioUpdated(double ratio);
+    void bitDecoded(QString);
 
 private slots:
     void readSoundData();

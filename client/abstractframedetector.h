@@ -11,6 +11,7 @@ public:
 
 signals:
     void detected(FrameAudioPtr);
+    void bitDecoded(QString);
 
 public slots:
     virtual void processAudio(const QByteArray& audio) = 0;

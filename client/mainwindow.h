@@ -18,6 +18,7 @@ private slots:
     void saveSelectedAsFile();
     void openLogFile();
     void openWavFile();
+    void bitDecoded(const QString& str);
 
 private:
     void initializeSettings();

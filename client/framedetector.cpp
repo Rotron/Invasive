@@ -1,6 +1,7 @@
 #include "framedetector.h"
 #include "frameaudio.h"
 #include "window.h"
+#include <iostream>
 
 namespace {
 
@@ -25,19 +26,21 @@ FrameDetector::FrameDetector(const QAudioFormat& format, QObject *parent) :
     AbstractFrameDetector(parent),
     format_(format),
     audio_buffer_(AUDIO_BUFFER_SIZE),
-    bufs1200_(BITS_PER_BYTE),
-    bufc1200_(BITS_PER_BYTE),
+    bufs500_(BITS_PER_BYTE),
+    bufc500_(BITS_PER_BYTE),
     bufs2200_(BITS_PER_BYTE),
     bufc2200_(BITS_PER_BYTE),
     bufsignal_(SN_LEVEL_BUFFER_SIZE),
     bufflag_(FRAME_FLAG_BUFFER_SIZE),
     bufthreshold_(THRESHOLD_BUFFER_SIZE),
     lowpass_(FIRFilter::FIR_LOWPASS,   KaiserBessel<220>(), SAMPLING_RATE, 1200, 600.0),
-    bandpass_(FIRFilter::FIR_BANDPASS, KaiserBessel<220>(), SAMPLING_RATE, 400,  1200.0, 2200.0),
-    bandstop_(FIRFilter::FIR_BANDSTOP, KaiserBessel<220>(), SAMPLING_RATE, 400,  1200.0, 2200.0),
+    bandpass_(FIRFilter::FIR_BANDPASS, KaiserBessel<220>(), SAMPLING_RATE, 400,  400.0, 600.0),
+    bandstop_(FIRFilter::FIR_BANDSTOP, KaiserBessel<220>(), SAMPLING_RATE, 400,  400.0, 600.0),
     total_count_(0),
     frame_sequence_(0),
     prev_count_(0),
+    seq_count_(0),
+    prev_bit_(true),
     level_(0.0),
     signal_level_(0.0),
     input_level_(0.0),
@@ -67,10 +70,11 @@ void FrameDetector::processAudio(const QByteArray& data)
         uint64_t count = i + total_count_;
 
         double sample_bandpassed = bandpass_.process(sample);
-        bufs1200_.push_back(sin(M_PI * 2 / sample_rate * 1200.0 * count) * sample_bandpassed);
-        bufc1200_.push_back(cos(M_PI * 2 / sample_rate * 1200.0 * count) * sample_bandpassed);
-        bufs2200_.push_back(sin(M_PI * 2 / sample_rate * 2200.0 * count) * sample_bandpassed);
-        bufc2200_.push_back(cos(M_PI * 2 / sample_rate * 2200.0 * count) * sample_bandpassed);
+        double sample_bandstoped = bandstop_.process(sample);
+        bufs500_.push_back(sin(M_PI * 2 / sample_rate * 500.0 * count) * sample_bandpassed);
+        bufc500_.push_back(cos(M_PI * 2 / sample_rate * 500.0 * count) * sample_bandpassed);
+        bufs2200_.push_back(sin(M_PI * 2 / sample_rate * 500.0 * count) *sample_bandstoped);
+        bufc2200_.push_back(cos(M_PI * 2 / sample_rate * 500.0 * count) *sample_bandstoped);
 
         double ss = std::fabs(sample_bandpassed);
         double ns = std::fabs(sample);
@@ -84,9 +88,35 @@ void FrameDetector::processAudio(const QByteArray& data)
         double ratio = (input_level_ > 1.0) ? signal_level_ / input_level_ : 1.0;
         bufsignal_.push_back(ratio);
 
-        double low  = std::hypotf(bufs1200_.sum(), bufc1200_.sum());
+        double low  = std::hypotf(bufs500_.sum(), bufc500_.sum());
         double high = std::hypotf(bufs2200_.sum(), bufc2200_.sum());
         double level = low - high;
+
+        if ((total_count_ + i) % (format_.sampleRate() / 480) == 0) {
+            //qDebug() << (high - low);
+            bool bit = (high - low > 20000);
+            if (bit) {
+                emit detected(FrameAudioPtr());
+            }
+            if (prev_bit_ == bit) {
+                seq_count_++;
+            } else {
+                if (seq_count_ >= 10) {
+                    QString str;
+                    if (bit) {
+                        str += "[ ] ";
+                    } else {
+                        str += "[*] ";
+                    }
+                    str += QString::number(seq_count_) + "\t";
+                    //str += QString::number(1.0 * seq_count_ / (format_.sampleRate() * 4 / 480.0)) + "sec";
+                    qDebug() << str;
+                    emit bitDecoded(str);
+                }
+                seq_count_ = 1;
+            }
+            prev_bit_ = bit;
+        }
 
         bufflag_.push_back(level);
 

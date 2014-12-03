@@ -43,6 +43,7 @@ MainWindow::MainWindow(QWidget *parent) :
     frame_list_ = new FrameListWidget(this);
     splitter->addWidget(frame_list_);
     connect(frame_list_, SIGNAL(itemSelectionChanged()), this, SLOT(selectionChanged()));
+    frame_list_->setVisible(false);
 
     QVBoxLayout* right_vlayout = new QVBoxLayout();
     right_vlayout->setContentsMargins(0, 0, 0, 0);
@@ -75,6 +76,7 @@ MainWindow::MainWindow(QWidget *parent) :
             waterfall_, SLOT(setDecodeRatio(double)));
     connect(modem_, SIGNAL(frameDetected()), waterfall_, SLOT(detected()));
     connect(modem_, SIGNAL(frameDecoded(FramePtr)), waterfall_, SLOT(decorded()));
+    connect(modem_, SIGNAL(bitDecoded(QString)), this, SLOT(bitDecoded(QString)));
 
     QString log_path = settings_.value("log/path").toString();
     logger_ = new FrameLogger(log_path, this);
@@ -97,6 +99,11 @@ MainWindow::MainWindow(QWidget *parent) :
 MainWindow::~MainWindow()
 {
 
+}
+
+void MainWindow::bitDecoded(const QString& str)
+{
+    frame_browser_->append(str);
 }
 
 void MainWindow::frameDecoded()

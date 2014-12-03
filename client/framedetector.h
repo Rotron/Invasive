@@ -17,8 +17,8 @@ public slots:
 private:
     QAudioFormat format_;
     RingBuffer<double> audio_buffer_;
-    RingBuffer<double> bufs1200_;
-    RingBuffer<double> bufc1200_;
+    RingBuffer<double> bufs500_;
+    RingBuffer<double> bufc500_;
     RingBuffer<double> bufs2200_;
     RingBuffer<double> bufc2200_;
     RingBuffer<double> bufsignal_;
@@ -30,6 +30,8 @@ private:
     uint64_t total_count_;
     uint32_t frame_sequence_;
     uint64_t prev_count_;
+    uint64_t seq_count_;
+    bool prev_bit_;
     double level_;
     double signal_level_;
     double input_level_;

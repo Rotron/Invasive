@@ -301,6 +301,7 @@ void WaterfallView::setupShader()
         "  else if (value > 0.66) gl_FragColor = mix(color3, color4, (value - 0.66) / 0.33);",
         "  else if (value > 0.33) gl_FragColor = mix(color2, color3, (value - 0.33) / 0.33);",
         "  else if (value > 0.1) gl_FragColor = mix(color1, color2, value / 0.33);",
+        "  else gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);",
         "}",
     };
     glShaderSource(frag, sizeof(frag_source) / sizeof(frag_source[0]), frag_source, NULL);
